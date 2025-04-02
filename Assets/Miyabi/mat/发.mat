@@ -52,7 +52,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _LightTex:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 2b2c759285da57e4f92bd0996707b6cf, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
@@ -89,6 +89,10 @@ Material:
         m_Offset: {x: 0, y: 0}
     - _OtherDataTex:
         m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _OtherDataTex1:
+        m_Texture: {fileID: 2800000, guid: 13a51878585b4b541b9c02952bb2c7ff, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _OtherDataTex2:
@@ -180,7 +184,7 @@ Material:
     - _NoseLineKonDisp: 0.62
     - _OcclusionStrength: 1
     - _Outline: 1
-    - _OutlineWidth: 1
+    - _OutlineWidth: 2
     - _Parallax: 0.02
     - _QueueOffset: 0
     - _ReceiveShadows: 1
@@ -254,11 +258,12 @@ Material:
     - _MatCapColorTint3: {r: 1, g: 1, b: 1, a: 1}
     - _MatCapColorTint4: {r: 1, g: 1, b: 1, a: 1}
     - _MatCapColorTint5: {r: 1, g: 1, b: 1, a: 1}
-    - _OutlineColor: {r: 0, g: 0, b: 0, a: 1}
-    - _OutlineColor2: {r: 1, g: 1, b: 1, a: 1}
-    - _OutlineColor3: {r: 1, g: 1, b: 1, a: 1}
-    - _OutlineColor4: {r: 1, g: 1, b: 1, a: 1}
-    - _OutlineColor5: {r: 1, g: 1, b: 1, a: 1}
+    - _OutlineColor: {r: 0.9528302, g: 0.13932894, b: 0.13932894, a: 1}
+    - _OutlineColor1: {r: 1, g: 0.5058824, b: 0.5058824, a: 1}
+    - _OutlineColor2: {r: 0.33333334, g: 0.33333334, b: 0.33333334, a: 1}
+    - _OutlineColor3: {r: 0.33333334, g: 0.33333334, b: 0.33333334, a: 1}
+    - _OutlineColor4: {r: 0.33333334, g: 0.33333334, b: 0.33333334, a: 1}
+    - _OutlineColor5: {r: 0.33333334, g: 0.33333334, b: 0.33333334, a: 1}
     - _PostFrontTint: {r: 1, g: 1, b: 1, a: 1}
     - _PostShadowFadeTint: {r: 1, g: 1, b: 1, a: 1}
     - _PostShadowTint: {r: 1, g: 1, b: 1, a: 1}

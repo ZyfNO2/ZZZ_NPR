@@ -9,8 +9,8 @@ Shader "ZZZ/ZZZSurface"
         _Color ("Color", Color) = (1,1,1,1)
         [NoScaleOffset]_MainTex ("Texture", 2D) = "white" {}
         [NoScaleOffset]_LightTex ("Light Tex", 2D) = "linearGray" {}
-        [NoScaleOffset]_OtherDataTex ("Other Data Tex", 2D) = "white" {}
-        [NoScaleOffset]_OtherDataTex2 ("Other Data Tex", 2D) = "white" {}
+        [NoScaleOffset]_OtherDataTex1 ("Other Data Tex 1", 2D) = "white" {}
+        [NoScaleOffset]_OtherDataTex2 ("Other Data Tex 2", 2D) = "white" {}
 
         _NoseLineHorDisp ("Hori Disappear Value", Range(0.85, 0.98)) = 0.92
         _NoseLineKonDisp ("KonDisapear Value", Range(0.5, 0.7)) = 0.62
@@ -117,7 +117,7 @@ Shader "ZZZ/ZZZSurface"
 
         [Header(Outline)]
         [Toggle(_OUTLINE_PASS)] _Outline ("Outline", Float) = 1
-        _OutlineColor ("Outline Color 1", Color) = (1,1,1,1)
+        _OutlineColor1 ("Outline Color 1", Color) = (1,1,1,1)
         _OutlineColor2 ("Outline Color 2", Color) = (1,1,1,1)
         _OutlineColor3 ("Outline Color 3", Color) = (1,1,1,1)
         _OutlineColor4 ("Outline Color 4", Color) = (1,1,1,1)
@@ -226,13 +226,26 @@ Shader "ZZZ/ZZZSurface"
         #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
         #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl"
 
+        #define DFINE_SELECT(TYPE)\
+        TYPE select(int id, TYPE e0, TYPE e1, TYPE e2, TYPE e3, TYPE e4)    {return TYPE(id > 0 ? (id > 1 ? (id > 2 ? (id > 3 ? e4 : e3) : e2) : e1) : e0);}\
+        TYPE##2 select(int id, TYPE##2 e0, TYPE##2 e1, TYPE##2 e2, TYPE##2 e3, TYPE##2 e4)  {return TYPE##2(id > 0 ? (id > 1 ? (id > 2 ? (id > 3 ? e4 : e3) : e2) : e1) : e0);}\
+        TYPE##3 select(int id, TYPE##3 e0, TYPE##3 e1, TYPE##3 e2, TYPE##3 e3, TYPE##3 e4)  {return TYPE##3(id > 0 ? (id > 1 ? (id > 2 ? (id > 3 ? e4 : e3) : e2) : e1) : e0);}\
+        TYPE##4 select(int id, TYPE##4 e0, TYPE##4 e1, TYPE##4 e2, TYPE##4 e3, TYPE##4 e4)  {return TYPE##4(id > 0 ? (id > 1 ? (id > 2 ? (id > 3 ? e4 : e3) : e2) : e1) : e0);}
+
+        DFINE_SELECT(bool)
+        DFINE_SELECT(uint)
+        DFINE_SELECT(int)
+        DFINE_SELECT(float)
+        DFINE_SELECT(half)
+
+        
         CBUFFER_START(UnityPerMaterial)
 
         
         float4 _Color;
         sampler2D _MainTex;
         sampler2D _LightTex;
-        sampler2D _OtherDataTex;
+        sampler2D _OtherDataTex1;
         sampler2D _OtherDataTex2;
         float _NoseLineHorDisp;
         float _NoseLineKonDisp;
@@ -330,7 +343,7 @@ Shader "ZZZ/ZZZSurface"
         float3 _UISunColor4;
         float3 _UISunColors;
 
-        float3 _OutlineColor;
+        float3 _OutlineColor1;
         float3 _OutlineColor2;
         float3 _OutlineColor3;
         float3 _OutlineColor4;
@@ -434,9 +447,47 @@ Shader "ZZZ/ZZZSurface"
                 baseAlpha = mainTex.a;
             }
             #endif
+
+            float3 normalWS = normalize(input.normalWS);
+            float3 pixelNormalWS = normalWS;
+            float diffuseBias = 0;
+
+            float3 positionWS = input.positionWSAndFogFactor.xyz;
+
+            float4 shadowCoord = TransformWorldToShadowCoord(positionWS);
+            Light mainLight = GetMainLight(shadowCoord);
+            float3 lightDirectionWS = normalize(mainLight.direction);
+
+            float sgn = input.tangentWS.w;
+            float3 tangentWS = normalize(input.tangentWS.xyz);
+            float3 bitangentWS = sgn * cross(normalWS.xyz,tangentWS.xyz);
+
+            #if _DOMAIN_BODY
+            {
+                float4 lightData = tex2D(_LightTex,input.uv);
+                lightData = lightData*2.0 - 1.0;
+                diffuseBias = lightData.z * 2.0;
+
+                float3 pixelNormalTS = float3(lightData.xy,0.0);
+                pixelNormalTS.xy *= _BumpScale;
+                pixelNormalTS.z = sqrt(1.0 - min(0.0,dot(pixelNormalTS.xy,pixelNormalTS.xy)));
+                pixelNormalWS = TransformTangentToWorld(pixelNormalTS,float3x3(tangentWS,bitangentWS,normalWS));
+                pixelNormalWS = normalize(pixelNormalWS);
+                
+            }
+            #endif
             
+            normalWS *= isFrontFace ? 1:-1;
+            pixelNormalWS *= isFrontFace ? 1:-1;
             
-            return float4(baseColor,baseAlpha);
+            float baseAttenuation = 1.0;
+            {
+                float NoL = dot(pixelNormalWS,lightDirectionWS);
+                //baseAttenuation = NoL;
+                baseAttenuation = NoL+diffuseBias;
+            }
+            return float4(baseAttenuation.xxx,baseAlpha);
+            //return float4(baseColor,baseAlpha);
         }
 
 
@@ -825,9 +876,32 @@ Shader "ZZZ/ZZZSurface"
                 
             }
             
-            float4 frag(Varyings input) : SV_Target
+            float4 frag(Varyings input):SV_Target
             {
-                return float4(0, 0, 0, 1);
+                #if !_OUTLINE_PASS
+                clip(-1);
+                #endif
+                float3 outlineColor = 0;
+
+                #if _DOMAIN_FACE
+                {
+                    outlineColor = _OutlineColor1.rgb;
+                }
+                #elif _DOMAIN_BODY
+                {
+                    float4 otherData = tex2D(_OtherDataTex1,input.uv);
+                    int materialId = max(0,4-floor(otherData.x * 5));
+                    //outlineColor = select(materialId,float3(1,1,1),float3(1,1,1),float3(1,1,1),float3(1,1,1),float3(1,1,1));
+                    outlineColor = select(materialId,_OutlineColor1,_OutlineColor2,_OutlineColor3,_OutlineColor4,_OutlineColor5);
+                }
+                #endif
+
+                outlineColor *= 0.2;
+
+                float4 color = float4(outlineColor, 1);
+                color.rgb = MixFog(color.rgb, input.fogFactor);
+                return color;
+
             }
             ENDHLSL
         }
