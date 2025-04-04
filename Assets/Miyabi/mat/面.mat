@@ -278,11 +278,11 @@ Material:
     - _OutlineColor4: {r: 0.33333334, g: 0.33333334, b: 0.33333334, a: 1}
     - _OutlineColor5: {r: 0.33333334, g: 0.33333334, b: 0.33333334, a: 1}
     - _PostFrontTint: {r: 1, g: 1, b: 1, a: 1}
-    - _PostShadowFadeTint: {r: 1, g: 1, b: 1, a: 1}
-    - _PostShadowTint: {r: 1, g: 1, b: 1, a: 1}
-    - _PostShallowFadeTint: {r: 1, g: 1, b: 1, a: 1}
-    - _PostShallowTint: {r: 1, g: 1, b: 1, a: 1}
-    - _PostSssTint: {r: 1, g: 1, b: 1, a: 1}
+    - _PostShadowFadeTint: {r: 0.8039216, g: 0.8039216, b: 0.8039216, a: 1}
+    - _PostShadowTint: {r: 0.8039216, g: 0.8039216, b: 0.8039216, a: 1}
+    - _PostShallowFadeTint: {r: 0.9019608, g: 0.9019608, b: 0.9019608, a: 1}
+    - _PostShallowTint: {r: 0.9019608, g: 0.9019608, b: 0.9019608, a: 1}
+    - _PostSssTint: {r: 1, g: 0.94509804, b: 0.9019608, a: 1}
     - _RefractParam: {r: 5, g: 5, b: 0, a: 0}
     - _RefractParam2: {r: 5, g: 5, b: 0, a: 0}
     - _RefractParam3: {r: 5, g: 5, b: 0, a: 0}
@@ -294,12 +294,14 @@ Material:
     - _RimGlowLightColor4: {r: 0.55, g: 0.55, b: 0.55, a: 1}
     - _RimGlowLightColors: {r: 0.55, g: 0.55, b: 0.55, a: 1}
     - _ShadowColor: {r: 0.6, g: 0.6, b: 0.6, a: 1}
+    - _ShadowColor1: {r: 0.6, g: 0.6, b: 0.6, a: 1}
     - _ShadowColor2: {r: 0.6, g: 0.6, b: 0.6, a: 1}
     - _ShadowColor3: {r: 0.6, g: 0.6, b: 0.6, a: 1}
     - _ShadowColor4: {r: 0.6, g: 0.6, b: 0.6, a: 1}
-    - _ShadowColors: {r: 0.6, g: 0.6, b: 0.6, a: 1}
+    - _ShadowColors: {r: 0.9019608, g: 0.9019608, b: 0.9019608, a: 1}
     - _ShallowColor: {r: 0.8, g: 0.8, b: 0.8, a: 1}
-    - _ShallowColor2: {r: 0.8, g: 0.8, b: 0.8, a: 1}
+    - _ShallowColor1: {r: 0.93333334, g: 0.8666667, b: 0.8666667, a: 1}
+    - _ShallowColor2: {r: 0.8666667, g: 0.7490196, b: 0.7490196, a: 1}
     - _ShallowColor3: {r: 0.8, g: 0.8, b: 0.8, a: 1}
     - _ShallowColor4: {r: 0.8, g: 0.8, b: 0.8, a: 1}
     - _ShallowColors: {r: 0.8, g: 0.8, b: 0.8, a: 1}

@@ -48,24 +48,24 @@ Shader "ZZZ/ZZZSurface"
         _ScreenSpaceShadowFadeout ("Screen Space Shadow Fadeout", Range(0, 10)) = 0.2
         
         [Header(Diffuse)]
-        _ShallowColor ("Shadow Color 1", Color) = (0.8,0.8,0.8,1)
-        _ShallowColor2 ("Shadow Color 2", Color) = (0.8,0.8,0.8,1)
-        _ShallowColor3 ("Shadow Color 3", Color) = (0.8,0.8,0.8,1)
-        _ShallowColor4 ("Shadow Color 4", Color) = (0.8,0.8,0.8,1)
-        _ShallowColors ("Shadow Color 5", Color) = (0.8,0.8,0.8,1)
-
-        _ShadowColor ("Shadow Color 1", Color) = (0.6,0.6,0.6,1)
+        _ShadowColor1 ("Shadow Color 1", Color) = (0.6,0.6,0.6,1)
         _ShadowColor2 ("Shadow Color 2", Color) = (0.6,0.6,0.6,1)
         _ShadowColor3 ("Shadow Color 3", Color) = (0.6,0.6,0.6,1)
         _ShadowColor4 ("Shadow Color 4", Color) = (0.6,0.6,0.6,1)
         _ShadowColors ("Shadow Color 5", Color) = (0.6,0.6,0.6,1)
+        
+        _ShallowColor1 ("Shallow Color 1", Color) = (0.8,0.8,0.8,1)
+        _ShallowColor2 ("Shallow Color 2", Color) = (0.8,0.8,0.8,1)
+        _ShallowColor3 ("Shallow Color 3", Color) = (0.8,0.8,0.8,1)
+        _ShallowColor4 ("Shallow Color 4", Color) = (0.8,0.8,0.8,1)
+        _ShallowColors ("Shallow Color 5", Color) = (0.8,0.8,0.8,1)
 
-        _PostShallowTint ("Post Shadow Tint", Color) = (1,1,1,1)
-        _PostShallowFadeTint ("Post Shadow Fade Tint", Color) = (1,1,1,1)
+        _PostShallowTint ("Post Shallow Tint", Color) = (1,1,1,1)
+        _PostShallowFadeTint ("Post Shallow Fade Tint", Color) = (1,1,1,1)
         _PostShadowTint ("Post Shadow Tint", Color) = (1,1,1,1)
         _PostShadowFadeTint ("Post Shadow Fade Tint", Color) = (1,1,1,1)
-        _PostFrontTint ("Post Front Tint", Color) = (1,1,1,1)
         _PostSssTint ("Post SSS Tint", Color) = (1,1,1,1)
+        _PostFrontTint ("Post Front Tint", Color) = (1,1,1,1)
 
         _AlbedoSmoothness ("Albedo Smoothness", Range(0, 1)) = 0.1
 
@@ -226,6 +226,23 @@ Shader "ZZZ/ZZZSurface"
         #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
         #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl"
 
+        #define DEFINE_MINMAX3(TYPE)\
+        TYPE min3(TYPE a, TYPE b, TYPE c) {return TYPE(min(min(a, b), c));};\
+        TYPE##2 min3(TYPE##2 a, TYPE##2 b, TYPE##2 c) {return TYPE##2(min(min(a, b), c));}\
+        TYPE##3 min3(TYPE##3 a, TYPE##3 b, TYPE##3 c) {return TYPE##3(min(min(a, b), c));}\
+        TYPE##4 min3(TYPE##4 a, TYPE##4 b, TYPE##4 c) {return TYPE##4(min(min(a, b), c));}\
+        TYPE max3(TYPE a, TYPE b, TYPE c){return TYPE(max(max(a, b), c));}\
+        TYPE##2 max3(TYPE##2 a, TYPE##2 b, TYPE##2 c) {return TYPE##2(max(max(a, b), c));}\
+        TYPE##3 max3(TYPE##3 a, TYPE##3 b, TYPE##3 c) {return TYPE##3(max(max(a, b), c));}\
+        TYPE##4 max3(TYPE##4 a, TYPE##4 b, TYPE##4 c) {return TYPE##4(max(max(a, b), c));}
+
+        DEFINE_MINMAX3(bool)
+        DEFINE_MINMAX3(uint)
+        DEFINE_MINMAX3(int)
+        DEFINE_MINMAX3(float)
+        DEFINE_MINMAX3(half)
+              
+
         #define DFINE_SELECT(TYPE)\
         TYPE select(int id, TYPE e0, TYPE e1, TYPE e2, TYPE e3, TYPE e4)    {return TYPE(id > 0 ? (id > 1 ? (id > 2 ? (id > 3 ? e4 : e3) : e2) : e1) : e0);}\
         TYPE##2 select(int id, TYPE##2 e0, TYPE##2 e1, TYPE##2 e2, TYPE##2 e3, TYPE##2 e4)  {return TYPE##2(id > 0 ? (id > 1 ? (id > 2 ? (id > 3 ? e4 : e3) : e2) : e1) : e0);}\
@@ -238,10 +255,25 @@ Shader "ZZZ/ZZZSurface"
         DFINE_SELECT(float)
         DFINE_SELECT(half)
 
-        
-        CBUFFER_START(UnityPerMaterial)
+        float AverageColor(float3 color)
+        {
+            return dot(color,float3(1.0,1.0,1.0))/3.0;
+        }
 
-        
+        float3 NormalizeColorByAverage(float3 color)
+        {
+            float average = AverageColor(color);
+            return color/max(average,1e-5);
+        }
+
+        float3 ScaleColorByMax(float3 color)
+        {
+            float maxComponent = max3(color.r,color.g,color.b);
+            maxComponent = min(maxComponent,1.0);
+            return  float3(color * maxComponent);
+        }
+
+        CBUFFER_START(UnityPerMaterial)
         float4 _Color;
         sampler2D _MainTex;
         sampler2D _LightTex;
@@ -278,13 +310,13 @@ Shader "ZZZ/ZZZSurface"
         float _ScreenSpaceShadowThreshold;
         float _ScreenSpaceShadowFadeout;
 
-        float3 _ShallowColor;
+        float3 _ShallowColor1;
         float3 _ShallowColor2;
         float3 _ShallowColor3;
         float3 _ShallowColor4;
         float3 _ShallowColor5;
 
-        float3 _ShadowColor;
+        float3 _ShadowColor1;
         float3 _ShadowColor2;
         float3 _ShadowColor3;
         float3 _ShadowColor4;
@@ -452,11 +484,14 @@ Shader "ZZZ/ZZZSurface"
             float3 pixelNormalWS = normalWS;
             float diffuseBias = 0;
 
+            int materialId = 0;
+            
             float3 positionWS = input.positionWSAndFogFactor.xyz;
 
             float4 shadowCoord = TransformWorldToShadowCoord(positionWS);
             Light mainLight = GetMainLight(shadowCoord);
             float3 lightDirectionWS = normalize(mainLight.direction);
+            float3 lightColor = mainLight.color;
 
             float sgn = input.tangentWS.w;
             float3 tangentWS = normalize(input.tangentWS.xyz);
@@ -473,9 +508,14 @@ Shader "ZZZ/ZZZSurface"
                 pixelNormalTS.z = sqrt(1.0 - min(0.0,dot(pixelNormalTS.xy,pixelNormalTS.xy)));
                 pixelNormalWS = TransformTangentToWorld(pixelNormalTS,float3x3(tangentWS,bitangentWS,normalWS));
                 pixelNormalWS = normalize(pixelNormalWS);
+
+                float4 otherData = tex2D(_OtherDataTex1,input.uv);
+                materialId = max(0,4-floor(otherData.x * 5));
                 
             }
             #endif
+
+            
             
             normalWS *= isFrontFace ? 1:-1;
             pixelNormalWS *= isFrontFace ? 1:-1;
@@ -483,11 +523,86 @@ Shader "ZZZ/ZZZSurface"
             float baseAttenuation = 1.0;
             {
                 float NoL = dot(pixelNormalWS,lightDirectionWS);
-                //baseAttenuation = NoL;
                 baseAttenuation = NoL+diffuseBias;
             }
-            return float4(baseAttenuation.xxx,baseAlpha);
-            //return float4(baseColor,baseAlpha);
+
+            float albedoSmoothness = max(1e-5,_AlbedoSmoothness);
+
+            float albedoShadowFade = 1.0;
+            float albedoShadow = 1.0;
+            float albedoShallowFade = 1.0;
+            float albedoShallow = 1.0;
+            float albedoSSS = 1.0;
+            float albedoFront = 1.0;
+            float albedoForward = 1.0;
+            {
+                float attenuation = baseAttenuation * 1.5;
+                float s0 = albedoSmoothness * 1.5;
+                float s1 = 1.0 - s0;
+
+                float aRamp[6] = {
+                    (attenuation + 1.5)/s1 + 0.0,
+                    (attenuation + 0.5)/s0 + 0.5,
+                    (attenuation + 0.0)/s1 + 0.5,
+                    (attenuation - 0.5)/s0 + 0.5,
+                    (attenuation - 0.5)/s0 - 0.5,
+                    (attenuation - 2.0)/s1 + 1.5,
+                };
+
+                albedoShadowFade = saturate(1-aRamp[0]);
+                albedoShadow = saturate(min(1 - aRamp[1],aRamp[0]));
+                albedoShallowFade = saturate(min(1 - aRamp[2],aRamp[1]));
+                albedoShallow = saturate(min(1 - aRamp[3],aRamp[2]));
+                albedoSSS = saturate(min(1 - aRamp[4],aRamp[3]));
+                albedoFront = saturate(min(1 - aRamp[5],aRamp[4]));
+                albedoForward = saturate(aRamp[5]);
+                
+            }
+
+            float3 shadowFadeColor = 1.0;
+            float3 shadowColor = 1.0;
+            float3 shallowFadeColor = 1.0;
+            float3 shallowColor = 1.0;
+            float3 sssColor = 1.0;
+            float3 frontColor = 1.0;
+            float3 fowardColor = 1.0;
+            {
+                float zFade = saturate(input.positionCS.w * 0.43725);
+                shadowColor = select(materialId,
+                    _ShadowColor1,
+                    _ShadowColor2,
+                    _ShadowColor3,
+                    _ShadowColor4,
+                    _ShadowColor5
+                );
+
+                shadowColor = lerp(NormalizeColorByAverage(shadowColor), shadowColor, zFade);
+                shadowFadeColor = shadowColor * _PostShadowFadeTint;
+                shadowColor = shadowColor * _PostShadowTint;
+
+                shallowColor = select(materialId,
+                    _ShallowColor1,
+                    _ShallowColor2,
+                    _ShallowColor3,
+                    _ShallowColor4,
+                    _ShallowColor5
+                );
+
+                shallowColor = lerp(NormalizeColorByAverage(shallowColor), shallowColor, zFade);
+                shallowFadeColor = shallowColor * _PostShallowFadeTint;
+                shallowColor = shallowColor * _PostShallowTint;
+                
+                sssColor = _PostSssTint;
+                frontColor = _PostFrontTint;
+                fowardColor = 1.0;
+            }
+
+            float3 lightColorScaledByMax = ScaleColorByMax(lightColor);
+            float3 albedo = (albedoForward * fowardColor + albedoFront * frontColor + albedoSSS * sssColor) * lightColor;
+            albedo += (albedoShadowFade * shadowFadeColor + albedoShadow * shadowColor + albedoShallowFade * shallowFadeColor + albedoShallow * shallowColor) * lightColorScaledByMax;
+            
+            return float4(albedo * baseColor,baseAlpha);
+            
         }
 
 

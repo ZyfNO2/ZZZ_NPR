@@ -278,11 +278,11 @@ Material:
     - _OutlineColor4: {r: 0.33333334, g: 0.33333334, b: 0.33333334, a: 1}
     - _OutlineColor5: {r: 0.33333334, g: 0.33333334, b: 0.33333334, a: 1}
     - _PostFrontTint: {r: 1, g: 1, b: 1, a: 1}
-    - _PostShadowFadeTint: {r: 1, g: 1, b: 1, a: 1}
-    - _PostShadowTint: {r: 1, g: 1, b: 1, a: 1}
-    - _PostShallowFadeTint: {r: 1, g: 1, b: 1, a: 1}
-    - _PostShallowTint: {r: 1, g: 1, b: 1, a: 1}
-    - _PostSssTint: {r: 1, g: 1, b: 1, a: 1}
+    - _PostShadowFadeTint: {r: 0.8039216, g: 0.8039216, b: 0.8039216, a: 1}
+    - _PostShadowTint: {r: 0.8039216, g: 0.8039216, b: 0.8039216, a: 1}
+    - _PostShallowFadeTint: {r: 0.9019608, g: 0.9019608, b: 0.9019608, a: 1}
+    - _PostShallowTint: {r: 0.9019608, g: 0.9019608, b: 0.9019608, a: 1}
+    - _PostSssTint: {r: 1, g: 0.94509804, b: 0.9019608, a: 1}
     - _RefractParam: {r: 5, g: 5, b: 0, a: 0}
     - _RefractParam2: {r: 5, g: 5, b: 0, a: 0}
     - _RefractParam3: {r: 5, g: 5, b: 0, a: 0}
@@ -294,15 +294,17 @@ Material:
     - _RimGlowLightColor4: {r: 0.55, g: 0.55, b: 0.55, a: 1}
     - _RimGlowLightColors: {r: 0.55, g: 0.55, b: 0.55, a: 1}
     - _ShadowColor: {r: 0.6, g: 0.6, b: 0.6, a: 1}
-    - _ShadowColor2: {r: 0.6, g: 0.6, b: 0.6, a: 1}
-    - _ShadowColor3: {r: 0.6, g: 0.6, b: 0.6, a: 1}
-    - _ShadowColor4: {r: 0.6, g: 0.6, b: 0.6, a: 1}
-    - _ShadowColors: {r: 0.6, g: 0.6, b: 0.6, a: 1}
+    - _ShadowColor1: {r: 0.5254902, g: 0.52156866, b: 0.67058825, a: 1}
+    - _ShadowColor2: {r: 0.8745098, g: 0.9098039, b: 0.92941177, a: 1}
+    - _ShadowColor3: {r: 0.9019608, g: 0.80784315, b: 0.7490196, a: 1}
+    - _ShadowColor4: {r: 0.6117647, g: 0.5803922, b: 0.7372549, a: 1}
+    - _ShadowColors: {r: 0.5764706, g: 0.627451, b: 0.69803923, a: 1}
     - _ShallowColor: {r: 0.8, g: 0.8, b: 0.8, a: 1}
-    - _ShallowColor2: {r: 0.8, g: 0.8, b: 0.8, a: 1}
-    - _ShallowColor3: {r: 0.8, g: 0.8, b: 0.8, a: 1}
-    - _ShallowColor4: {r: 0.8, g: 0.8, b: 0.8, a: 1}
-    - _ShallowColors: {r: 0.8, g: 0.8, b: 0.8, a: 1}
+    - _ShallowColor1: {r: 0.7254902, g: 0.7490196, b: 0.81960785, a: 1}
+    - _ShallowColor2: {r: 0.8745098, g: 0.9098039, b: 0.92941177, a: 1}
+    - _ShallowColor3: {r: 0.9019608, g: 0.80784315, b: 0.7490196, a: 1}
+    - _ShallowColor4: {r: 0.6117647, g: 0.5803922, b: 0.7372549, a: 1}
+    - _ShallowColors: {r: 0.5764706, g: 0.627451, b: 0.69803923, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
     - _SpecularColor: {r: 1, g: 1, b: 1, a: 1}
     - _SpecularColor2: {r: 1, g: 1, b: 1, a: 1}
