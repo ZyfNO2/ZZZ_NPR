@@ -519,6 +519,37 @@ Shader "ZZZ/ZZZSurface"
             
             normalWS *= isFrontFace ? 1:-1;
             pixelNormalWS *= isFrontFace ? 1:-1;
+
+            float shadowAttenuation = 1.0;
+            #if _SCREEN_SPACE_OCCLUSION
+            {
+                //深度信息
+                float linerEyeDepth = input.positionCS.w;
+                //透视除法的因子
+                float perspective = 1.0/linerEyeDepth;
+                //计算偏移的乘量
+                float offsetMul = _ScreenSpaceShadowWidth * 5.0 * perspective / 100.0;
+
+                //光向量 ->视图空间
+                float3 lightDirectionVS = TransformWorldToViewDir(lightDirectionWS);
+                //偏移值
+                float2 offset = lightDirectionVS.xy * offsetMul;
+                //屏幕采样
+                int2 coord = input.positionCS.xy + offset * _ScaledScreenParams.xy;
+                //钳制边界
+                coord = min(max(0,coord),_ScaledScreenParams - 1);
+                //控制衰减程度，钳制
+                float offsetScenceDepth = LoadSceneDepth(coord);
+                //偏移后深度图减去原来深度图
+                float offsetSceneLinearEyeDepth = LinearEyeDepth(offsetScenceDepth,_ZBufferParams);
+
+                float fadeOut = max(1e-5,_ScreenSpaceShadowFadeout);
+                shadowAttenuation = saturate(offsetSceneLinearEyeDepth - (linerEyeDepth - _ScreenSpaceShadowThreshold)) * 50 / fadeOut;
+                
+            }
+            #endif
+
+            
             
             float baseAttenuation = 1.0;
             {
@@ -556,6 +587,24 @@ Shader "ZZZ/ZZZSurface"
                 albedoSSS = saturate(min(1 - aRamp[4],aRamp[3]));
                 albedoFront = saturate(min(1 - aRamp[5],aRamp[4]));
                 albedoForward = saturate(aRamp[5]);
+
+                //追加的投影修改
+                float sRamp[2] = {
+                    2.0 * shadowAttenuation, // Range[0,2]
+                    2.0 * shadowAttenuation - 1,//Range[-1,1] shadowAttenuation才进行修改
+                };
+
+                //投影消除锯齿
+                
+                //albedoShallowFade 完全交由 shadowAttenuation 控制
+                albedoShallowFade *= saturate(sRamp[0]);
+                //shadowAttenuation < 0.5的时候才进行补光，* saturate(1 - sRamp[0]) 保持能量守恒
+                albedoShallowFade +=(1 - albedoShadowFade - albedoShadow) * saturate(1 - sRamp[0]);
+                albedoShadow *= saturate(min(sRamp[0],1-sRamp[1])) + saturate(sRamp[1]);
+                albedoSSS *= saturate(min(sRamp[0],1-sRamp[1])) + saturate(sRamp[1]);
+                albedoSSS += (albedoFront + albedoForward) * saturate(min(sRamp[0],1-sRamp[1]));
+                albedoFront *= saturate(sRamp[1]);
+                albedoForward *= saturate(sRamp[1]);
                 
             }
 
@@ -570,7 +619,7 @@ Shader "ZZZ/ZZZSurface"
                 float zFade = saturate(input.positionCS.w * 0.43725);
                 shadowColor = select(materialId,
                     _ShadowColor1,
-                    _ShadowColor2,
+                    _ShadowColor2, 
                     _ShadowColor3,
                     _ShadowColor4,
                     _ShadowColor5
@@ -601,14 +650,14 @@ Shader "ZZZ/ZZZSurface"
             float3 albedo = (albedoForward * fowardColor + albedoFront * frontColor + albedoSSS * sssColor) * lightColor;
             albedo += (albedoShadowFade * shadowFadeColor + albedoShadow * shadowColor + albedoShallowFade * shallowFadeColor + albedoShallow * shallowColor) * lightColorScaledByMax;
             
-            return float4(albedo * baseColor,baseAlpha);
-            
+            //return float4(albedo * baseColor,baseAlpha);
+            return float4(albedo,baseAlpha);
         }
 
 
         ENDHLSL
 
-
+        //ShadowCaster
         Pass
         {
             Name "ShadowCaster"
@@ -686,6 +735,7 @@ Shader "ZZZ/ZZZSurface"
             ENDHLSL
         }
 
+        //DepthOnly
         Pass
         {
             Name "DepthOnly"
@@ -733,6 +783,7 @@ Shader "ZZZ/ZZZSurface"
             ENDHLSL
         }
         
+        //DepthNormals
         Pass
         {
             Name "DepthNormals"
@@ -794,6 +845,7 @@ Shader "ZZZ/ZZZSurface"
             ENDHLSL
         }
 
+        //UniversalForward
         Pass
         {
             Name "UniversalForward"
@@ -825,6 +877,7 @@ Shader "ZZZ/ZZZSurface"
             ENDHLSL
         }
 
+        //Outline
         Pass
         {
             Name "Outline"
@@ -1021,9 +1074,57 @@ Shader "ZZZ/ZZZSurface"
             ENDHLSL
         }
 
+        // DepthPass
+        pass
+        {
+            Name"DepthOnly"
+            Tags
+            {
+               "LightMode" = "DepthOnly"
+            }
+            ZWrite [_ZWrite]
+            ZTest LEqual
+            ColorMask 0
+            Cull [_Cull]
+            // HLSL程序段
+            HLSLPROGRAM
+
+            #pragma multi_compile_instancing
+            #pragma multi_compile _ DOTS_INSTANCING_ON
+
+            #pragma vertex vert
+            #pragma fragment frag
+
+
+            struct Attributes
+            {
+               float4 positionOS : POSITION;
+
+            };
+            struct Varyings
+            {
+               float4 positionCS : SV_POSITION;
+            };
+
+            Varyings vert(Attributes input)
+            {
+                Varyings output = (Varyings)0;
+                output.positionCS = TransformObjectToHClip(input.positionOS.xyz);
+                return output;
+            }
+
+            float4 frag(Varyings input) : SV_TARGET
+            {
+                clip(1.0 - _AlphaClip);
+
+                return 0;
+            }
+            ENDHLSL
+        }
+
     }
 
     
 
-    
+           
 }
