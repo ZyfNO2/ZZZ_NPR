@@ -10,7 +10,7 @@ Shader "ZZZ/ZZZSurface"
         [NoScaleOffset]_MainTex ("Texture", 2D) = "white" {}
         [NoScaleOffset]_LightTex ("Light Tex", 2D) = "linearGray" {}
         [NoScaleOffset]_OtherDataTex1 ("Other Data Tex 1", 2D) = "white" {}
-        [NoScaleOffset]_OtherDataTex2 ("Other Data Tex 2", 2D) = "white" {}
+        [NoScaleOffset]_OtherDataTex2 ("Other Data Tex 2", 2D) = "black" {}
 
         _NoseLineHorDisp ("Hori Disappear Value", Range(0.85, 0.98)) = 0.92
         _NoseLineKonDisp ("KonDisapear Value", Range(0.5, 0.7)) = 0.62
@@ -127,54 +127,54 @@ Shader "ZZZ/ZZZSurface"
 
         [Header(MatCap)]
         [Toggle(_MATCAP_ON)] _MatCap ("MatCap", Float) = 0
-        [NoScaleOffset] _MatCapTex ("MatCap Tex 1", 2D) = "white" {}
+        [NoScaleOffset] _MatCapTex1 ("MatCap Tex 1", 2D) = "white" {}
         [NoScaleOffset] _MatCapTex2 ("MatCap Tex 2", 2D) = "white" {}
         [NoScaleOffset] _MatCapTex3 ("MatCap Tex 3", 2D) = "white" {}
         [NoScaleOffset] _MatCapTex4 ("MatCap Tex 4", 2D) = "white" {}
         [NoScaleOffset] _MatCapTex5 ("MatCap Tex 5", 2D) = "white" {}
         
-        _MatCapColorTint ("Color Tint 1", Color) = (1,1,1,1)
+        _MatCapColorTint1 ("Color Tint 1", Color) = (1,1,1,1)
         _MatCapColorTint2 ("Color Tint 2", Color) = (1,1,1,1)
         _MatCapColorTint3 ("Color Tint 3", Color) = (1,1,1,1)
         _MatCapColorTint4 ("Color Tint 4", Color) = (1,1,1,1)
         _MatCapColorTint5 ("Color Tint 5", Color) = (1,1,1,1)
 
-        _MatCapColorBurst ("Color Burst 1", Range(0, 10)) = 1
+        _MatCapColorBurst1 ("Color Burst 1", Range(0, 10)) = 1
         _MatCapColorBurst2 ("Color Burst 2", Range(0, 10)) = 1
         _MatCapColorBurst3 ("Color Burst 3", Range(0, 10)) = 1
         _MatCapColorBurst4 ("Color Burst 4", Range(0, 10)) = 1
-        _MatCapColorBursts ("Color Burst 5", Range(0, 10)) = 1
+        _MatCapColorBurst5 ("Color Burst 5", Range(0, 10)) = 1
 
-        _MatCapAlphaBurst ("Alpha Burst 1", Range(0, 10)) = 1
+        _MatCapAlphaBurst1 ("Alpha Burst 1", Range(0, 10)) = 1
         _MatCapAlphaBurst2 ("Alpha Burst 2", Range(0, 10)) = 1
         _MatCapAlphaBurst3 ("Alpha Burst 3", Range(0, 10)) = 1
         _MatCapAlphaBurst4 ("Alpha Burst 4", Range(0, 10)) = 1
-        _MatCapAlphaBursts ("Alpha Burst 5", Range(0, 10)) = 1
+        _MatCapAlphaBurst5 ("Alpha Burst 5", Range(0, 10)) = 1
 
-        [Toggle] _MatCapRefract ("MapCap Refract 1", Float) = 0
+        [Toggle] _MatCapRefract1 ("MapCap Refract 1", Float) = 0
         [Toggle] _MatCapRefract2 ("MapCap Refract 2", Float) = 0
         [Toggle] _MatCapRefract3 ("MapCap Refract 3", Float) = 0
         [Toggle] _MatCapRefract4 ("MapCap Refract 4", Float) = 0
-        [Toggle] _MatCapRefracts ("MapCap Refract 5", Float) = 0
+        [Toggle] _MatCapRefract5 ("MapCap Refract 5", Float) = 0
 
-        _RefractDepth ("Refract Depth 1", Range(0, 2)) = 0.5
-        _RefractDepth2 ("Refract Depth 2", Range(0, 2)) = 0.5
-        _RefractDepth3 ("Refract Depth 3", Range(0, 2)) = 0.5
-        _RefractDepth4 ("Refract Depth 4", Range(0, 2)) = 0.5
-        _RefractDepths ("Refract Depth 5", Range(0, 2)) = 0.5
+        _MatCapRefractDepth1 ("Refract Depth 1", Range(0, 2)) = 0.5
+        _MatCapRefractDepth2 ("Refract Depth 2", Range(0, 2)) = 0.5
+        _MatCapRefractDepth3 ("Refract Depth 3", Range(0, 2)) = 0.5
+        _MatCapRefractDepth4 ("Refract Depth 4", Range(0, 2)) = 0.5
+        _MatCapRefractDepth5 ("Refract Depth 5", Range(0, 2)) = 0.5
 
-        _RefractParam ("Refract WrapOffset 1", Vector) = (5,5,0,0)
-        _RefractParam2 ("Refract WrapOffset 2", Vector) = (5,5,0,0)
-        _RefractParam3 ("Refract WrapOffset 3", Vector) = (5,5,0,0)
-        _RefractParam4 ("Refract WrapOffset 4", Vector) = (5,5,0,0)
-        _RefractParams ("Refract WrapOffset 5", Vector) = (5,5,0,0)
+        _MatCapRefractParam1 ("Refract WrapOffset 1", Vector) = (5,5,0,0)
+        _MatCapRefractParam2 ("Refract WrapOffset 2", Vector) = (5,5,0,0)
+        _MatCapRefractParam3 ("Refract WrapOffset 3", Vector) = (5,5,0,0)
+        _MatCapRefractParam4 ("Refract WrapOffset 4", Vector) = (5,5,0,0)
+        _MatCapRefractParam5 ("Refract WrapOffset 5", Vector) = (5,5,0,0)
                 
         
-        [Enum(AlphaBlended,0,Add,1,Overlay,2)] _MatCapBlendMode ("MatCap Blend Mode 1", Float) = 0
+        [Enum(AlphaBlended,0,Add,1,Overlay,2)] _MatCapBlendMode1 ("MatCap Blend Mode 1", Float) = 0
         [Enum(AlphaBlended,0,Add,1,Overlay,2)] _MatCapBlendMode2 ("MatCap Blend Mode 2", Float) = 0
         [Enum(AlphaBlended,0,Add,1,Overlay,2)] _MatCapBlendMode3 ("MatCap Blend Mode 3", Float) = 0
         [Enum(AlphaBlended,0,Add,1,Overlay,2)] _MatCapBlendMode4 ("MatCap Blend Mode 4", Float) = 0
-        [Enum(AlphaBlended,0,Add,1,Overlay,2)] _MatCapBlendModes ("MatCap Blend Mode 5", Float) = 0
+        [Enum(AlphaBlended,0,Add,1,Overlay,2)] _MatCapBlendMode5 ("MatCap Blend Mode 5", Float) = 0
 
         [Header(Option)]
         [Enum(UnityEngine.Rendering.CullMode)] _Cull ("Cull (Default back)", Float) = 2
@@ -393,49 +393,49 @@ Shader "ZZZ/ZZZSurface"
         float _OutlineWidth;
         float _MaxOutlineZOffset;
 
-        sampler2D _MatCapTex;
+        sampler2D _MatCapTex1;
         sampler2D _MatCapTex2;
         sampler2D _MatCapTex3;
         sampler2D _MatCapTex4;
         sampler2D _MatCapTex5;
 
-        float3 _MatCapColorTint;
+        float3 _MatCapColorTint1;
         float3 _MatCapColorTint2;
         float3 _MatCapColorTint3;
         float3 _MatCapColorTint4;
-        float3 _MatCapColorTints;
+        float3 _MatCapColorTint5;
 
-        float _MatCapColorBurst;
+        float _MatCapColorBurst1;
         float _MatCapColorBurst2;
         float _MatCapColorBurst3;
         float _MatCapColorBurst4;
-        float _MatCapColorBursts;
+        float _MatCapColorBurst5;
 
-        float _MatCapAlphaBurst;
+        float _MatCapAlphaBurst1;
         float _MatCapAlphaBurst2;
         float _MatCapAlphaBurst3;
         float _MatCapAlphaBurst4;
-        float _MatCapAlphaBursts;
+        float _MatCapAlphaBurst5;
 
-        float _MatCapRefract;
+        float _MatCapRefract1;
         float _MatCapRefract2;
         float _MatCapRefract3;
         float _MatCapRefract4;
-        float _MatCapRefracts;
+        float _MatCapRefract5;
 
-        float _RefractDepth;
-        float _RefractDepth2;
-        float _RefractDepth3;
-        float _RefractDepth4;
-        float _RefractDepth5;
+        float _MatCapRefractDepth1;
+        float _MatCapRefractDepth2;
+        float _MatCapRefractDepth3;
+        float _MatCapRefractDepth4;
+        float _MatCapRefractDepth5;
 
-        float4 _RefractParam;
-        float4 _RefractParam2;
-        float4 _RefractParam3;
-        float4 _RefractParam4;
-        float4 _RefractParam5;
+        float4 _MatCapRefractParam1;
+        float4 _MatCapRefractParam2;
+        float4 _MatCapRefractParam3;
+        float4 _MatCapRefractParam4;
+        float4 _MatCapRefractParam5;
 
-        int _MatCapBlendMode;
+        int _MatCapBlendMode1;
         int _MatCapBlendMode2;
         int _MatCapBlendMode3;
         int _MatCapBlendMode4;
@@ -445,7 +445,8 @@ Shader "ZZZ/ZZZSurface"
         TEXTURE2D(_SDFTex);
         SAMPLER(sampler_SDFTex);
 
-
+        //matcap
+        float matCapMask = 0;
        
         
         CBUFFER_END
@@ -514,8 +515,10 @@ Shader "ZZZ/ZZZSurface"
             float3 tangentWS = normalize(input.tangentWS.xyz);
             float3 bitangentWS = sgn * cross(normalWS.xyz,tangentWS.xyz);
 
+            
             #if _DOMAIN_BODY
             {
+                
                 float4 lightData = tex2D(_LightTex,input.uv);
                 lightData = lightData*2.0 - 1.0;
                 diffuseBias = lightData.z * 2.0;
@@ -527,11 +530,12 @@ Shader "ZZZ/ZZZSurface"
                 pixelNormalWS = normalize(pixelNormalWS);
 
                 float4 otherData = tex2D(_OtherDataTex1,input.uv);
+                //材质索引
                 materialId = max(0,4-floor(otherData.x * 5));
-                
             }
+            
+            
             #endif
-
             
             
             normalWS *= isFrontFace ? 1:-1;
@@ -583,6 +587,7 @@ Shader "ZZZ/ZZZSurface"
             float albedoSSS = 1.0;
             float albedoFront = 1.0;
             float albedoForward = 1.0;
+            
             #if !_DOMAIN_FACE
             {
                 float attenuation = baseAttenuation * 1.5;
@@ -858,15 +863,117 @@ Shader "ZZZ/ZZZSurface"
             #endif
 
 
+            float3 matCapColor = baseColor;
+            #if _MATCAP_ON && _DOMAIN_BODY
+            {
+                float mask = matCapMask;
+                float3 normalVS = TransformWorldToViewDir(pixelNormalWS);
+                //[-1,1] - [0,1]
+                float2 matCapUV = normalVS.xy * 0.5 + 0.5;
+                //折射
+                float refract = select(materialId,_MatCapRefract1,_MatCapRefract2,_MatCapRefract3,_MatCapRefract4,_MatCapRefract5);
+                //matcap
+                float4 otherData2 = tex2D(_OtherDataTex2,input.uv);
+                matCapMask = otherData2.b;
+                
+                //对需要折射的部分进行判断
+                if(refract > 0.5)
+                {
+                    float4 param = select(materialId,
+                        _MatCapRefractParam1,
+                        _MatCapRefractParam2,
+                        _MatCapRefractParam3,
+                        _MatCapRefractParam4,
+                        _MatCapRefractParam5
+                    );
+                    
+                    float depth = select(materialId,
+                        _MatCapRefractDepth1,
+                        _MatCapRefractDepth2,
+                        _MatCapRefractDepth3,
+                        _MatCapRefractDepth4,
+                        _MatCapRefractDepth5
+                        
+                    );
 
+                    matCapUV = matCapUV * depth + param.xy * input.uv + param.zw;
+
+                    matCapColor = select(materialId,
+                    tex2D(_MatCapTex1, matCapUV).rgb,
+                    tex2D(_MatCapTex2, matCapUV).rgb,
+                    tex2D(_MatCapTex3, matCapUV).rgb,
+                    tex2D(_MatCapTex4, matCapUV).rgb,
+                    tex2D(_MatCapTex5, matCapUV).rgb
+                    
+                    );
+
+                    float3 tintColor = select(materialId,
+                        _MatCapColorTint1,
+                        _MatCapColorTint2,
+                        _MatCapColorTint3,
+                        _MatCapColorTint4,
+                        _MatCapColorTint5
+                    );
+                    float alphaBurst = select(materialId,
+                        _MatCapAlphaBurst1,
+                        _MatCapAlphaBurst2,
+                        _MatCapAlphaBurst3,
+                        _MatCapAlphaBurst4,
+                        _MatCapAlphaBurst5
+                    );
+
+                    float colorBurst = select(materialId,
+                        _MatCapColorBurst1,
+                        _MatCapColorBurst2,
+                        _MatCapColorBurst3,
+                        _MatCapColorBurst4,
+                        _MatCapColorBurst5
+                    );
+
+                    int blendMode = select(materialId,
+                        _MatCapBlendMode1,
+                        _MatCapBlendMode2,
+                        _MatCapBlendMode3,
+                        _MatCapBlendMode4,
+                        _MatCapBlendMode5
+                    );
+
+                    // 乘法Alpha混合
+                    if(blendMode == 0)
+                    {
+                        float alpha = saturate(alphaBurst * mask);
+                        float3 blendColor = tintColor * matCapColor * colorBurst;
+                        matCapColor = lerp(baseColor, blendColor, alpha);
+                   
+                    }
+                    // 加法混合
+                    else if(blendMode == 1)
+                    {
+                        float alpha = saturate(alphaBurst * mask);
+                        float3 blendColor = tintColor * matCapColor * colorBurst;
+                        matCapColor = baseColor + blendColor * alpha;
+                        
+                    }
+                    // 叠加混合
+                    else if(blendMode == 2)
+                    {
+                        float alpha = saturate(alphaBurst * mask);
+                        float3 blendColor = saturate((matCapColor * tintColor - 0.5) * colorBurst + matCapColor * tintColor);
+                        blendColor = lerp(0.5, blendColor, alpha);
+                        matCapColor = lerp(blendColor * baseColor * 2, 1 - 2 * (1 - baseColor) * (1 - blendColor), baseColor >= 0.5);
+                    }
+                    
+                }
+                
+            }
+            #endif
             
             
             float3 lightColorScaledByMax = ScaleColorByMax(lightColor);
             float3 albedo = (albedoForward * fowardColor + albedoFront * frontColor + albedoSSS * sssColor) * lightColor;
             albedo += (albedoShadowFade * shadowFadeColor + albedoShadow * shadowColor + albedoShallowFade * shallowFadeColor + albedoShallow * shallowColor) * lightColorScaledByMax;
             
-            //return float4(albedo * baseColor,baseAlpha);
-            return float4(albedo * baseColor,baseAlpha);
+            return float4(baseColor * albedo,baseAlpha);
         }
 
 

@@ -75,6 +75,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _MatCapTex1:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _MatCapTex2:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -112,6 +116,10 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _ParallaxMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SDFTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -165,24 +173,37 @@ Material:
     - _HighlightShapes: 0
     - _MatCap: 0
     - _MatCapAlphaBurst: 1
+    - _MatCapAlphaBurst1: 1
     - _MatCapAlphaBurst2: 1
     - _MatCapAlphaBurst3: 1
     - _MatCapAlphaBurst4: 1
+    - _MatCapAlphaBurst5: 1
     - _MatCapAlphaBursts: 1
     - _MatCapBlendMode: 0
+    - _MatCapBlendMode1: 0
     - _MatCapBlendMode2: 0
     - _MatCapBlendMode3: 0
     - _MatCapBlendMode4: 0
+    - _MatCapBlendMode5: 0
     - _MatCapBlendModes: 0
     - _MatCapColorBurst: 1
+    - _MatCapColorBurst1: 1
     - _MatCapColorBurst2: 1
     - _MatCapColorBurst3: 1
     - _MatCapColorBurst4: 1
+    - _MatCapColorBurst5: 1
     - _MatCapColorBursts: 1
     - _MatCapRefract: 0
+    - _MatCapRefract1: 0
     - _MatCapRefract2: 0
     - _MatCapRefract3: 0
     - _MatCapRefract4: 0
+    - _MatCapRefract5: 0
+    - _MatCapRefractDepth1: 0.5
+    - _MatCapRefractDepth2: 0.5
+    - _MatCapRefractDepth3: 0.5
+    - _MatCapRefractDepth4: 0.5
+    - _MatCapRefractDepth5: 0.5
     - _MatCapRefracts: 0
     - _MaxOutlineZOffset: 0.005
     - _Metallic: 0
@@ -217,11 +238,11 @@ Material:
     - _ScreenSpaceRim: 1
     - _ScreenSpaceRimBrightness: 1
     - _ScreenSpaceRimFadeout: 1
-    - _ScreenSpaceRimThreshold: 0.01
+    - _ScreenSpaceRimThreshold: 0.02
     - _ScreenSpaceRimWidth: 1
     - _ScreenSpaceShadow: 1
     - _ScreenSpaceShadowFadeout: 0.2
-    - _ScreenSpaceShadowThreshold: 0.015
+    - _ScreenSpaceShadowThreshold: 0.002
     - _ScreenSpaceShadowWidth: 0.2
     - _ShapeSoftness: 0.1
     - _ShapeSoftness2: 0.1
@@ -262,14 +283,20 @@ Material:
     - _BaseColor: {r: 0.95468706, g: 0.95468706, b: 0.95468706, a: 1}
     - _Color: {r: 0.95468706, g: 0.95468706, b: 0.95468706, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _HeadCenter: {r: -0.0141027495, g: 1.3736656, b: -0.17715807, a: 0}
+    - _HeadCenter: {r: -0.014991127, g: 1.4234335, b: -0.18188857, a: 0}
     - _HeadForward: {r: -0.02417774, g: 1.4186202, b: -0.2308012, a: 0}
     - _HeadRight: {r: -0.06413192, g: 1.4234335, b: -0.17265919, a: 0}
     - _MatCapColorTint: {r: 1, g: 1, b: 1, a: 1}
+    - _MatCapColorTint1: {r: 1, g: 1, b: 1, a: 1}
     - _MatCapColorTint2: {r: 1, g: 1, b: 1, a: 1}
     - _MatCapColorTint3: {r: 1, g: 1, b: 1, a: 1}
     - _MatCapColorTint4: {r: 1, g: 1, b: 1, a: 1}
     - _MatCapColorTint5: {r: 1, g: 1, b: 1, a: 1}
+    - _MatCapRefractParam1: {r: 5, g: 5, b: 0, a: 0}
+    - _MatCapRefractParam2: {r: 5, g: 5, b: 0, a: 0}
+    - _MatCapRefractParam3: {r: 5, g: 5, b: 0, a: 0}
+    - _MatCapRefractParam4: {r: 5, g: 5, b: 0, a: 0}
+    - _MatCapRefractParam5: {r: 5, g: 5, b: 0, a: 0}
     - _OutlineColor: {r: 0.9528302, g: 0.13932894, b: 0.13932894, a: 1}
     - _OutlineColor1: {r: 1, g: 0.5058824, b: 0.5058824, a: 1}
     - _OutlineColor2: {r: 0.33333334, g: 0.33333334, b: 0.33333334, a: 1}
