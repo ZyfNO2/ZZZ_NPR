@@ -583,6 +583,7 @@ Shader "ZZZ/ZZZSurface"
             float albedoSSS = 1.0;
             float albedoFront = 1.0;
             float albedoForward = 1.0;
+            #if !_DOMAIN_FACE
             {
                 float attenuation = baseAttenuation * 1.5;
                 float s0 = albedoSmoothness * 1.5;
@@ -624,6 +625,8 @@ Shader "ZZZ/ZZZSurface"
                 albedoForward *= saturate(sRamp[1]);
                 
             }
+            #endif
+            
 
             float3 shadowFadeColor = 1.0;
             float3 shadowColor = 1.0;
@@ -676,6 +679,7 @@ Shader "ZZZ/ZZZSurface"
             float angleFunction = 0;   // 角度函数值（来自SDF纹理G通道）
             float angleMapMask = 0;    // 区域遮罩值（来自SDF纹理A通道）
             float angleThreshold = 0;   // 计算得到的光照角度阈值[0,1]
+            float4 angleData;
 
             #if _DOMAIN_FACE  // 面部专属计算
             {
@@ -740,24 +744,30 @@ Shader "ZZZ/ZZZSurface"
                 // A - 区域遮罩（混合权重）
                 // 注意：B通道未使用（可扩展）
                 // --------------------------------------------------
-                float4 angleData = SAMPLE_TEXTURE2D(_SDFTex, sampler_SDFTex, angleUV);
+                angleData = SAMPLE_TEXTURE2D(_SDFTex, sampler_SDFTex, angleUV);
                 angleMapping = angleData.r;
                 angleFunction = angleData.g;
                 angleMapMask = angleData.a;
+
+                float3 outlineColor = _OutlineColor1.rgb * 0.2;
+                float viewDotHeadUp = dot(headUp, input.viewDirectionWS);
+                float viewDotHeadForward = dot(headForward, input.viewDirectionWS);
+
+                // 视角从上往下到水平之间Alpha由水平值控制，从下往上则由_NoseLineRndDisk控制
+                float dispValue = lerp(_NoseLineKonDisp, _NoseLineHorDisp, smoothstep(0, 0.75, saturate(viewDotHeadUp + 0.85)));
+                //dispValue = viewDotHeadForward - dispValue;
+                dispValue = viewDotHeadForward * dispValue;
+                dispValue = smoothstep(0, 0.02, dispValue);
+                dispValue -= mainTex.a ;
+                baseColor = lerp(baseColor, outlineColor, saturate(dispValue));
+                
+                
             }
             #endif
 
-            // ========================================================
-            // 面部SDF光照计算系统
-            // 功能：基于角度映射纹理实现面部多级阴影/高光过渡
-            // - _SDFTex 应包含预计算的R(角度映射)/G(角度函数)/A(区域遮罩)
-            // - albedoSmoothness 基础光滑度建议范围[0.02, 0.2]
-            // - angleThreshold 角度阈值建议范围[0.3, 0.7]
-            // ========================================================
-
-            // 初始化前向光照系数（美术可调节的基准值）
-            float angleForward = 1;  // 范围[0,1]，控制正面光照强度基准
-
+            
+            
+            float angleForward = 0.1;  // 范围[0,1]，控制正面光照强度基准
             #if _DOMAIN_FACE  // 面部专属光照计算
             {
                 // --------------------------------------------------
@@ -815,11 +825,11 @@ Shader "ZZZ/ZZZSurface"
                 // --------------------------------------------------
                 // 阶段5：阴影衰减混合
                 // 说明：shadowAttenuation通常来自主光源阴影图
-                // 2.0为阴影增强系数（美术可调）
+                // 2.0为阴影增强系数
                 // --------------------------------------------------
                 float sRamp[1] = { 2. * shadowAttenuation };
 
-                // 动态区域调整（美术可调节逻辑）：
+                // 动态区域调整：
                 angleShadowFade *= saturate(1 - sRamp[0]);  // 阴影区受光照衰减影响
                 
                 // 浅阴影混合公式说明：
