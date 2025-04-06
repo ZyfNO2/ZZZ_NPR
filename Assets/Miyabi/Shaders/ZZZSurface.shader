@@ -863,6 +863,13 @@ Shader "ZZZ/ZZZSurface"
             #endif
 
 
+        
+            
+            
+            float3 lightColorScaledByMax = ScaleColorByMax(lightColor);
+            float3 albedo = (albedoForward * fowardColor + albedoFront * frontColor + albedoSSS * sssColor) * lightColor;
+            albedo += (albedoShadowFade * shadowFadeColor + albedoShadow * shadowColor + albedoShallowFade * shallowFadeColor + albedoShallow * shallowColor) * lightColorScaledByMax;
+
             float3 matCapColor = baseColor;
             #if _MATCAP_ON && _DOMAIN_BODY
             {
@@ -906,6 +913,8 @@ Shader "ZZZ/ZZZSurface"
                     tex2D(_MatCapTex5, matCapUV).rgb
                     
                     );
+                    
+                    //到这里正常
 
                     float3 tintColor = select(materialId,
                         _MatCapColorTint1,
@@ -921,7 +930,7 @@ Shader "ZZZ/ZZZSurface"
                         _MatCapAlphaBurst4,
                         _MatCapAlphaBurst5
                     );
-
+                    
                     float colorBurst = select(materialId,
                         _MatCapColorBurst1,
                         _MatCapColorBurst2,
@@ -929,7 +938,7 @@ Shader "ZZZ/ZZZSurface"
                         _MatCapColorBurst4,
                         _MatCapColorBurst5
                     );
-
+                    
                     int blendMode = select(materialId,
                         _MatCapBlendMode1,
                         _MatCapBlendMode2,
@@ -937,30 +946,29 @@ Shader "ZZZ/ZZZSurface"
                         _MatCapBlendMode4,
                         _MatCapBlendMode5
                     );
-
-                    // 乘法Alpha混合
-                    if(blendMode == 0)
-                    {
-                        float alpha = saturate(alphaBurst * mask);
-                        float3 blendColor = tintColor * matCapColor * colorBurst;
-                        matCapColor = lerp(baseColor, blendColor, alpha);
-                   
-                    }
-                    // 加法混合
+                    
+                    //乘法Alpha混合
+                     if(blendMode == 0)
+                     {
+                         float alpha = saturate(alphaBurst * matCapMask);
+                         float3 blendColor = tintColor * matCapColor * colorBurst;
+                         matCapColor = lerp(baseColor, blendColor, alpha);
+                     }
+                    // //加法混合
                     else if(blendMode == 1)
                     {
-                        float alpha = saturate(alphaBurst * mask);
+                        float alpha = saturate(alphaBurst * matCapMask);
                         float3 blendColor = tintColor * matCapColor * colorBurst;
                         matCapColor = baseColor + blendColor * alpha;
-                        
                     }
-                    // 叠加混合
+                    // //叠加混合
                     else if(blendMode == 2)
                     {
-                        float alpha = saturate(alphaBurst * mask);
-                        float3 blendColor = saturate((matCapColor * tintColor - 0.5) * colorBurst + matCapColor * tintColor);
+                        float alpha = saturate(alphaBurst * matCapMask);
+                        float3 blendColor = saturate((matCapColor * tintColor - 0.5) * colorBurst + matCapColor *  tintColor);
                         blendColor = lerp(0.5, blendColor, alpha);
                         matCapColor = lerp(blendColor * baseColor * 2, 1 - 2 * (1 - baseColor) * (1 - blendColor), baseColor >= 0.5);
+                    
                     }
                     
                 }
@@ -968,12 +976,7 @@ Shader "ZZZ/ZZZSurface"
             }
             #endif
             
-            
-            float3 lightColorScaledByMax = ScaleColorByMax(lightColor);
-            float3 albedo = (albedoForward * fowardColor + albedoFront * frontColor + albedoSSS * sssColor) * lightColor;
-            albedo += (albedoShadowFade * shadowFadeColor + albedoShadow * shadowColor + albedoShallowFade * shallowFadeColor + albedoShallow * shallowColor) * lightColorScaledByMax;
-            
-            return float4(baseColor * albedo,baseAlpha);
+            return float4(matCapColor,baseAlpha);
         }
 
 
