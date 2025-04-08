@@ -283,6 +283,17 @@ Shader "ZZZ/ZZZSurface"
             return  float3(color * maxComponent);
         }
 
+        //颜色钳制处理
+        float3 ClampColorMax(float3 color)
+        {
+            float maxComponent = max3(color.r, color.g, color.b);
+            if(maxComponent > 1.0)
+            {
+                return color / maxComponent;
+            }
+            return color;
+        }
+
         CBUFFER_START(UnityPerMaterial)
         float4 _Color;
         sampler2D _MainTex;
@@ -533,8 +544,6 @@ Shader "ZZZ/ZZZSurface"
                 //材质索引
                 materialId = max(0,4-floor(otherData.x * 5));
             }
-            
-            
             #endif
             
             
@@ -542,6 +551,8 @@ Shader "ZZZ/ZZZSurface"
             pixelNormalWS *= isFrontFace ? 1:-1;
 
             float shadowAttenuation = 1.0;
+
+            //投影
             #if _SCREEN_SPACE_OCCLUSION
             {
                 //深度信息
@@ -569,15 +580,12 @@ Shader "ZZZ/ZZZSurface"
                 
             }
             #endif
-
-            
             
             float baseAttenuation = 1.0;
-            {
-                float NoL = dot(pixelNormalWS,lightDirectionWS);
-                baseAttenuation = NoL+diffuseBias;
-            }
+            float NoL = dot(pixelNormalWS,lightDirectionWS);
+            baseAttenuation = NoL+diffuseBias;
 
+            
             float albedoSmoothness = max(1e-5,_AlbedoSmoothness);
 
             float albedoShadowFade = 1.0;
@@ -588,7 +596,7 @@ Shader "ZZZ/ZZZSurface"
             float albedoFront = 1.0;
             float albedoForward = 1.0;
             
-            #if !_DOMAIN_FACE
+            #if _DOMAIN_BODY || _DOMAIN_EYE
             {
                 float attenuation = baseAttenuation * 1.5;
                 float s0 = albedoSmoothness * 1.5;
@@ -671,13 +679,7 @@ Shader "ZZZ/ZZZSurface"
                 fowardColor = 1.0;
             }
 
-            // ========================================================
-            // 面部SDF角度计算系统
-            // 功能：基于头部坐标系计算光照角度，采样SDF纹理数据
-            // 美术控制参数：
-            // - _HeadForward/_HeadRight/_HeadCenter：头部坐标系定义点
-            // - _SDFTex：包含角度映射(R)、角度函数(G)、区域遮罩(A)的纹理
-            // ========================================================
+           
 
             // 初始化输出变量
             float angleMapping = 0;    // 角度映射值（来自SDF纹理R通道）
@@ -862,18 +864,16 @@ Shader "ZZZ/ZZZSurface"
             }
             #endif
 
-
-        
-            
             
             float3 lightColorScaledByMax = ScaleColorByMax(lightColor);
             float3 albedo = (albedoForward * fowardColor + albedoFront * frontColor + albedoSSS * sssColor) * lightColor;
             albedo += (albedoShadowFade * shadowFadeColor + albedoShadow * shadowColor + albedoShallowFade * shallowFadeColor + albedoShallow * shallowColor) * lightColorScaledByMax;
 
             float3 matCapColor = baseColor;
+            //MatCap计算
             #if _MATCAP_ON && _DOMAIN_BODY
             {
-                float mask = matCapMask;
+                
                 float3 normalVS = TransformWorldToViewDir(pixelNormalWS);
                 //[-1,1] - [0,1]
                 float2 matCapUV = normalVS.xy * 0.5 + 0.5;
@@ -975,8 +975,44 @@ Shader "ZZZ/ZZZSurface"
                 
             }
             #endif
+
+            //颜色调整
+            float test;
+            float3 gammaColor = matCapColor;
+            {
+                float pixelNDotL = dot(pixelNormalWS, lightDirectionWS);
+                float NDotL = dot(normalWS, lightDirectionWS);
+
+                float occlusion = saturate(1 - 3 * (NDotL - pixelNDotL)) * 2;
+                occlusion *= sqrt(occlusion);
+                //occlusion = pow(occlusion, 1.5);
+                occlusion = min(1, occlusion);
+
+                test = occlusion;
+
+                //颜色Gamma矫正衰减系数
+                float attenuation = lerp((pixelNDotL * 0.5 + 0.5) * occlusion, saturate(pixelNDotL), 0.5);
+
+                //钳制亮度
+                float3 matCapColorClamped = ClampColorMax(matCapColor);
+
+                //颜色转单一亮度
+                float luminance = Luminance(matCapColor);
+                //计算gamma值
+                float gamma = lerp(luminance * 0.2875 + 1.4375, 1, attenuation);
+
+
+                //颜色进行Gamma
+                float3 matCapColorGamma = pow(max(1e-5, matCapColorClamped), gamma); 
+                //Gamma效果削弱
+                float3 matCapColorGammaHalf = lerp(matCapColor, matCapColorGamma, 0.5);
+                //均衡Gamma效果
+                gammaColor = lerp(matCapColorGammaHalf, matCapColorGamma, saturate(NDotL));
+                
+            }
+
             
-            return float4(matCapColor,baseAlpha);
+            return float4(gammaColor,baseAlpha);
         }
 
 
