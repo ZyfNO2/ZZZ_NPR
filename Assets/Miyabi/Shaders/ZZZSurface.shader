@@ -592,10 +592,8 @@ Shader "ZZZ/ZZZSurface"
             
             float baseAttenuation = 1.0;
             float NoL = dot(pixelNormalWS,lightDirectionWS);
-            baseAttenuation = NoL+diffuseBias;
-
-            
             float albedoSmoothness = max(1e-5,_AlbedoSmoothness);
+            baseAttenuation = NoL+diffuseBias;
 
             float albedoShadowFade = 1.0;
             float albedoShadow = 1.0;
@@ -604,50 +602,51 @@ Shader "ZZZ/ZZZSurface"
             float albedoSSS = 1.0;
             float albedoFront = 1.0;
             float albedoForward = 1.0;
-            
-            #if _DOMAIN_BODY || _DOMAIN_EYE
             {
-                float attenuation = baseAttenuation * 1.5;
-                float s0 = albedoSmoothness * 1.5;
-                float s1 = 1.0 - s0;
+                float attenuation = baseAttenuation * 1.5; //-1.5 ~ 1.5  
+                //光滑度系数调整
+                float s0 = albedoSmoothness * 1.5; // 0 ~ 1.5
+                //锐利系数
+                float s1 = 1.0 - s0; // -0.5 ~ 1
 
+                //将明暗分为6个部分 每0.5一段 1.5 ~ -1 
                 float aRamp[6] = {
-                    (attenuation + 1.5)/s1 + 0.0,
-                    (attenuation + 0.5)/s0 + 0.5,
-                    (attenuation + 0.0)/s1 + 0.5,
-                    (attenuation - 0.5)/s0 + 0.5,
-                    (attenuation - 0.5)/s0 - 0.5,
-                    (attenuation - 2.0)/s1 + 1.5,
+                    (attenuation + 1.5) / s1 + 0.0,     //aRamp[0] 强光衰减部分，表示最强的衰减和最深的阴影的负值
+                    (attenuation + 0.5) / s0 + 0.5,     //aRamp[1] 相对较弱的衰减，表征较浅的阴影。
+                    (attenuation + 0.0) / s1 + 0.5,     //aRamp[2] 中等衰减，逐渐过渡到正常的阴影
+                    (attenuation - 0.5) / s0 + 0.5,     //aRamp[3] 较弱衰减，较弱阴影区域
+                    (attenuation - 0.5) / s0 - 0.5,     //aRamp[4] 衰减较少，代表反射或光照强度较强次表面的区域
+                    (attenuation - 2.0) / s1 + 1.5,     //aRamp[5] 最亮区域，接近没有衰减的部分
                 };
-
-                albedoShadowFade = saturate(1-aRamp[0]);
-                albedoShadow = saturate(min(1 - aRamp[1],aRamp[0]));
-                albedoShallowFade = saturate(min(1 - aRamp[2],aRamp[1]));
-                albedoShallow = saturate(min(1 - aRamp[3],aRamp[2]));
-                albedoSSS = saturate(min(1 - aRamp[4],aRamp[3]));
-                albedoFront = saturate(min(1 - aRamp[5],aRamp[4]));
-                albedoForward = saturate(aRamp[5]);
-
-                //追加的投影修改
+                albedoShadowFade = saturate(1 - aRamp[0]);                  //较深阴影
+                albedoShadow = saturate(min(1 - aRamp[1], aRamp[0]));       //较浅阴影
+                //albedoShadow = saturate(1 - aRamp[1]);   
+                albedoShallowFade = saturate(min(1 - aRamp[2], aRamp[1]));  //中间过渡部分较深阴影
+                albedoShallow = saturate(min(1 - aRamp[3], aRamp[2]));      //中间过渡部分较浅阴影
+                albedoSSS = saturate(min(1 - aRamp[4], aRamp[3]));          //中间过渡部分较浅阴影偏移出的次表面部分
+                albedoFront = saturate(min(1 - aRamp[5], aRamp[4]));        //明亮区域，接近没有衰减的部分
+                albedoForward = saturate(aRamp[5]);                         //最强反射部分
+            //******************************
+            //******************************
+                //投影追加修改（*）
                 float sRamp[2] = {
-                    2.0 * shadowAttenuation, // Range[0,2]
-                    2.0 * shadowAttenuation - 1,//Range[-1,1] shadowAttenuation才进行修改
+                    2.0 * shadowAttenuation,        // 范围[0, 2]   投影1
+                    2.0 * shadowAttenuation - 1     // 范围[-1, 1]  投影2 shadowAttenuationd大于0.5时才影响
                 };
-
-                //投影消除锯齿
+          
                 
-                //albedoShallowFade 完全交由 shadowAttenuation 控制
                 albedoShallowFade *= saturate(sRamp[0]);
-                //shadowAttenuation < 0.5的时候才进行补光，* saturate(1 - sRamp[0]) 保持能量守恒
-                albedoShallowFade +=(1 - albedoShadowFade - albedoShadow) * saturate(1 - sRamp[0]);
-                albedoShadow *= saturate(min(sRamp[0],1-sRamp[1])) + saturate(sRamp[1]);
-                albedoSSS *= saturate(min(sRamp[0],1-sRamp[1])) + saturate(sRamp[1]);
-                albedoSSS += (albedoFront + albedoForward) * saturate(min(sRamp[0],1-sRamp[1]));
+                albedoShallowFade += (1 - albedoShadowFade - albedoShadow) * saturate(1 - sRamp[0]);
+                //albedoShallowFade =saturate(albedoShallowFade); 
+
+                albedoShallow *= saturate(min(sRamp[0], 1 - sRamp[1])) + saturate(sRamp[1]);     
+                albedoSSS *= saturate(min(sRamp[0], 1 - sRamp[1])) + saturate(sRamp[1]);
+                albedoSSS += (albedoFront + albedoForward) * saturate(min(sRamp[0], 1 - sRamp[1]));
                 albedoFront *= saturate(sRamp[1]);
                 albedoForward *= saturate(sRamp[1]);
                 
             }
-            #endif
+           
             
             float3 shadowFadeColor = 1.0;
             float3 shadowColor = 1.0;
@@ -780,9 +779,6 @@ Shader "ZZZ/ZZZSurface"
                 
             }
             #endif
-
-            
-            
             float angleForward = 0.1;  // 范围[0,1]，控制正面光照强度基准
             #if _DOMAIN_FACE  // 面部专属光照计算
             {
@@ -1199,14 +1195,14 @@ Shader "ZZZ/ZZZSurface"
                  //return float4(specular.xxx, baseAlpha);
                 
                 //染色
-                // float3 tintColor = select(materialId,
-                //     _SpecularColor1,
-                //     _SpecularColor2,
-                //     _SpecularColor3,
-                //     _SpecularColor4,
-                //     _SpecularColor5
-                // );
-                float3 tintColor = float4(1,1,1,1);
+                 float3 tintColor = select(materialId,
+                     _SpecularColor1,
+                     _SpecularColor2,
+                     _SpecularColor3,
+                     _SpecularColor4,
+                     _SpecularColor5
+                 );
+                //float3 tintColor = float4(1,1,1,1);
                 specularColor = specular * tintColor;
                 //return float4(specularColor,baseAlpha);
             

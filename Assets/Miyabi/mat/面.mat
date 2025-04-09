@@ -144,7 +144,7 @@ Material:
     m_Floats:
     - MaxOutlineZOffset: 0
     - OutlineWidth: 6.84
-    - _AlbedoSmoothness: 0.1
+    - _AlbedoSmoothness: 0.2
     - _AlphaClip: 0
     - _AlphaToMask: 0
     - _AmbientColorIntensity: 0.333
@@ -247,7 +247,7 @@ Material:
     - _ScreenSpaceShadow: 1
     - _ScreenSpaceShadowFadeout: 0.2
     - _ScreenSpaceShadowThreshold: 0.002
-    - _ScreenSpaceShadowWidth: 0.2
+    - _ScreenSpaceShadowWidth: 0.05
     - _ShapeSoftness: 0.1
     - _ShapeSoftness1: 0.1
     - _ShapeSoftness2: 0.1
@@ -311,10 +311,10 @@ Material:
     - _OutlineColor4: {r: 0.33333334, g: 0.33333334, b: 0.33333334, a: 1}
     - _OutlineColor5: {r: 0.33333334, g: 0.33333334, b: 0.33333334, a: 1}
     - _PostFrontTint: {r: 1, g: 1, b: 1, a: 1}
-    - _PostShadowFadeTint: {r: 0.8039216, g: 0.8039216, b: 0.8039216, a: 1}
-    - _PostShadowTint: {r: 0.8039216, g: 0.8039216, b: 0.8039216, a: 1}
-    - _PostShallowFadeTint: {r: 0.9019608, g: 0.9019608, b: 0.9019608, a: 1}
-    - _PostShallowTint: {r: 0.9019608, g: 0.9019608, b: 0.9019608, a: 1}
+    - _PostShadowFadeTint: {r: 0.9019608, g: 0.9019608, b: 0.9019608, a: 1}
+    - _PostShadowTint: {r: 0.9019608, g: 0.9019608, b: 0.9019608, a: 1}
+    - _PostShallowFadeTint: {r: 0.8039216, g: 0.8039216, b: 0.8039216, a: 1}
+    - _PostShallowTint: {r: 0.8039216, g: 0.8039216, b: 0.8039216, a: 1}
     - _PostSssTint: {r: 1, g: 0.94509804, b: 0.9019608, a: 1}
     - _RefractParam: {r: 5, g: 5, b: 0, a: 0}
     - _RefractParam2: {r: 5, g: 5, b: 0, a: 0}
