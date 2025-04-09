@@ -16,7 +16,8 @@ Material:
   - _OUTLINE_PASS
   - _SCREEN_SPACE_RIM
   - _SCREEN_SPACE_SHADOW
-  m_InvalidKeywords: []
+  m_InvalidKeywords:
+  - _HIGHLIGHTSHAPE2_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -100,7 +101,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _OtherDataTex2:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: c7ea739363d201d46acb8b2452ab9759, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _ParallaxMap:
@@ -151,13 +152,15 @@ Material:
     - _DstBlendMode: 0
     - _EnvironmentReflections: 1
     - _GlossMapScale: 1
-    - _Glossiness: 0.5
+    - _Glossiness: 1
     - _GlossyReflections: 1
     - _HeadSphereRange: 0
     - _HighlightShape: 0
-    - _HighlightShape2: 0
+    - _HighlightShape1: 0
+    - _HighlightShape2: 1
     - _HighlightShape3: 0
     - _HighlightShape4: 0
+    - _HighlightShape5: 0
     - _HighlightShapes: 0
     - _MatCap: 0
     - _MatCapAlphaBurst: 1
@@ -194,9 +197,10 @@ Material:
     - _MatCapRefractDepth5: 0.5
     - _MatCapRefracts: 0
     - _MaxOutlineZOffset: 0.005
-    - _Metallic: 0
+    - _Metallic: 1
     - _Mode: 0
     - _ModelSize: 1
+    - _ModelSize1: 1
     - _ModelSize2: 1
     - _ModelSize3: 1
     - _ModelSize4: 1
@@ -233,6 +237,7 @@ Material:
     - _ScreenSpaceShadowThreshold: 0.002
     - _ScreenSpaceShadowWidth: 0.2
     - _ShapeSoftness: 0.1
+    - _ShapeSoftness1: 0.1
     - _ShapeSoftness2: 0.1
     - _ShapeSoftness3: 0.1
     - _ShapeSoftness4: 0.1
@@ -240,9 +245,10 @@ Material:
     - _SkinMatId: 0
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
-    - _SpecIntensity: 0.1
+    - _SpecIntensity: 0.25
     - _SpecularHighlights: 1
     - _SpecularRange: 1
+    - _SpecularRange1: 1
     - _SpecularRange2: 1
     - _SpecularRange3: 1
     - _SpecularRange4: 1
@@ -257,6 +263,7 @@ Material:
     - _StencilZFailOp: 0
     - _Surface: 0
     - _ToonSpecular: 0.01
+    - _ToonSpecular1: 0.01
     - _ToonSpecular2: 0.01
     - _ToonSpecular3: 0.01
     - _ToonSpecular4: 0.01
@@ -321,9 +328,11 @@ Material:
     - _ShallowColors: {r: 0.9019608, g: 0.83137256, b: 0.8745098, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
     - _SpecularColor: {r: 1, g: 1, b: 1, a: 1}
+    - _SpecularColor1: {r: 1, g: 1, b: 1, a: 1}
     - _SpecularColor2: {r: 1, g: 1, b: 1, a: 1}
     - _SpecularColor3: {r: 1, g: 1, b: 1, a: 1}
     - _SpecularColor4: {r: 1, g: 1, b: 1, a: 1}
+    - _SpecularColor5: {r: 1, g: 1, b: 1, a: 1}
     - _SpecularColors: {r: 1, g: 1, b: 1, a: 1}
     - _UISunColor: {r: 1, g: 0.92, b: 0.9, a: 1}
     - _UISunColor2: {r: 1, g: 0.92, b: 0.9, a: 1}

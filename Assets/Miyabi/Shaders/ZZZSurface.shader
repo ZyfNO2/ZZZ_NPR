@@ -16,19 +16,14 @@ Shader "ZZZ/ZZZSurface"
         _NoseLineKonDisp ("KonDisapear Value", Range(0.5, 0.7)) = 0.62
         _AlphaClip ("Alpha Clipping", Range(0,1)) = 0.333
         _BumpScale ("Normal Scale", Range(-5, 5)) = 1
-        _Glossiness ("Smoothness", Range(0, 1)) = 0.5
+        _Glossiness ("_Glossiness", Range(0, 1)) = 0.5
         _Metallic ("Metallic", Range(0, 1)) = 0
-
-//        [HideInInspector] _HeadCenter ("Head Center", Vector) = (0,0,0)
-//        [HideInInspector] _HeadForward ("Head Forward", Vector) = (0,0,0)
-//        [HideInInspector] _HeadRight ("Head Right", Vector) = (0,0,0)
-//        _HeadSphereRange ("Head Sphere Range", Range(0, 1)) = 0
-
+        
         _AmbientColorIntensity ("Ambient Intensity", Range(0, 1)) = 0.333
 
         [Enum(s0,0,s1,1,s2,2,s3,3,s4,4,s5,5)] _SkinMatId ("SkinMatId", Float) = 0
 
-        _ModelSize ("Model Size 1", Range(0, 100)) = 1
+        _ModelSize1 ("Model Size 1", Range(0, 100)) = 1
         _ModelSize2 ("Model Size 2", Range(0, 100)) = 1
         _ModelSize3 ("Model Size 3", Range(0, 100)) = 1
         _ModelSize4 ("Model Size 4", Range(0, 100)) = 1
@@ -70,25 +65,25 @@ Shader "ZZZ/ZZZSurface"
         _AlbedoSmoothness ("Albedo Smoothness", Range(0, 1)) = 0.1
 
         [Header(Specular)]
-        [Toggle]_HighlightShape ("Highlight Shape 1", Float) = 0
+        [Toggle]_HighlightShape1 ("Highlight Shape 1", Float) = 0
         [Toggle]_HighlightShape2 ("Highlight Shape 2", Float) = 0
         [Toggle]_HighlightShape3 ("Highlight Shape 3", Float) = 0
         [Toggle]_HighlightShape4 ("Highlight Shape 4", Float) = 0
-        [Toggle]_HighlightShapes ("Highlight Shape 5", Float) = 0
+        [Toggle]_HighlightShape5 ("Highlight Shape 5", Float) = 0
 
-        _ToonSpecular ("Toon Specular 1", Range(0, 1)) = 0.01
+        _ToonSpecular1 ("Toon Specular 1", Range(0, 1)) = 0.01
         _ToonSpecular2 ("Toon Specular 2", Range(0, 1)) = 0.01
         _ToonSpecular3 ("Toon Specular 3", Range(0, 1)) = 0.01
         _ToonSpecular4 ("Toon Specular 4", Range(0, 1)) = 0.01
         _ToonSpecular5 ("Toon Specular 5", Range(0, 1)) = 0.01
 
-        _SpecularRange ("Specular Range 0", Range(0, 2)) = 1
+        _SpecularRange1 ("Specular Range 0", Range(0, 2)) = 1
         _SpecularRange2 ("Specular Range 1", Range(0, 2)) = 1
         _SpecularRange3 ("Specular Range 2", Range(0, 2)) = 1
         _SpecularRange4 ("Specular Range 3", Range(0, 2)) = 1
         _SpecularRanges ("Specular Range 4", Range(0, 2)) = 1
 
-        _ShapeSoftness ("Shape Softness 1", Range(0, 1)) = 0.1
+        _ShapeSoftness1 ("Shape Softness 1", Range(0, 1)) = 0.1
         _ShapeSoftness2 ("Shape Softness 2", Range(0, 1)) = 0.1
         _ShapeSoftness3 ("Shape Softness 3", Range(0, 1)) = 0.1
         _ShapeSoftness4 ("Shape Softness 4", Range(0, 1)) = 0.1
@@ -96,11 +91,11 @@ Shader "ZZZ/ZZZSurface"
         
         _SpecIntensity ("Specular Intensity", Range(0, 1)) = 0.1
 
-        [HDR] _SpecularColor ("Specular Color 1", Color) = (1,1,1,1)
+        [HDR] _SpecularColor1 ("Specular Color 1", Color) = (1,1,1,1)
         [HDR] _SpecularColor2 ("Specular Color 2", Color) = (1,1,1,1)
         [HDR] _SpecularColor3 ("Specular Color 3", Color) = (1,1,1,1)
         [HDR] _SpecularColor4 ("Specular Color 4", Color) = (1,1,1,1)
-        [HDR] _SpecularColors ("Specular Color 5", Color) = (1,1,1,1)
+        [HDR] _SpecularColor5 ("Specular Color 5", Color) = (1,1,1,1)
 
         [Header(Rim Glow)]
         [HDR] _RimGlowLightColor ("Light Color 1", Color) = (0.55,0.55,0.55,1)
@@ -316,7 +311,7 @@ Shader "ZZZ/ZZZSurface"
 
         int _SkinMatId;
 
-        float _ModelSize;
+        float _ModelSize1;
         float _ModelSize2;
         float _ModelSize3;
         float _ModelSize4;
@@ -352,25 +347,25 @@ Shader "ZZZ/ZZZSurface"
 
         float _AlbedoSmoothness;
 
-        float _HighlightShape;
+        float _HighlightShape1;
         float _HighlightShape2;
         float _HighlightShape3;
         float _HighlightShape4;
         float _HighlightShape5;
 
-        float _ToonSpecular;
+        float _ToonSpecular1;
         float _ToonSpecular2;
         float _ToonSpecular3;
         float _ToonSpecular4;
         float _ToonSpecular5;
 
-        float _SpecularRange;
+        float _SpecularRange1;
         float _SpecularRange2;
         float _SpecularRange3;
         float _SpecularRange4;
-        float _SpecularRanges;
+        float _SpecularRange5;
 
-        float _ShapeSoftness;
+        float _ShapeSoftness1;
         float _ShapeSoftness2;
         float _ShapeSoftness3;
         float _ShapeSoftness4;
@@ -378,7 +373,7 @@ Shader "ZZZ/ZZZSurface"
 
         float _SpecIntensity;
 
-        float3 _SpecularColor;
+        float3 _SpecularColor1;
         float3 _SpecularColor2;
         float3 _SpecularColor3;
         float3 _SpecularColor4;
@@ -458,7 +453,13 @@ Shader "ZZZ/ZZZSurface"
 
         //matcap
         float matCapMask = 0;
-       
+
+        //Metallic
+        float metallic = 0;
+
+        float specularMask = 0;
+
+        float smoothness = 0.58;
         
         CBUFFER_END
         struct UniversalAttributes
@@ -526,7 +527,7 @@ Shader "ZZZ/ZZZSurface"
             float3 tangentWS = normalize(input.tangentWS.xyz);
             float3 bitangentWS = sgn * cross(normalWS.xyz,tangentWS.xyz);
 
-            
+            //处理身体数据
             #if _DOMAIN_BODY
             {
                 
@@ -540,9 +541,17 @@ Shader "ZZZ/ZZZSurface"
                 pixelNormalWS = TransformTangentToWorld(pixelNormalTS,float3x3(tangentWS,bitangentWS,normalWS));
                 pixelNormalWS = normalize(pixelNormalWS);
 
-                float4 otherData = tex2D(_OtherDataTex1,input.uv);
                 //材质索引
+                float4 otherData = tex2D(_OtherDataTex1,input.uv);
                 materialId = max(0,4-floor(otherData.x * 5));
+                //matcap
+                float4 otherData2 = tex2D(_OtherDataTex2,input.uv);
+                matCapMask = otherData2.b;
+                //Metallic
+                metallic = _Metallic * otherData.g;
+                specularMask = otherData.b;
+                smoothness = _Glossiness * otherData2.g;
+               
             }
             #endif
             
@@ -640,7 +649,6 @@ Shader "ZZZ/ZZZSurface"
             }
             #endif
             
-
             float3 shadowFadeColor = 1.0;
             float3 shadowColor = 1.0;
             float3 shallowFadeColor = 1.0;
@@ -678,8 +686,6 @@ Shader "ZZZ/ZZZSurface"
                 frontColor = _PostFrontTint;
                 fowardColor = 1.0;
             }
-
-           
 
             // 初始化输出变量
             float angleMapping = 0;    // 角度映射值（来自SDF纹理R通道）
@@ -767,7 +773,10 @@ Shader "ZZZ/ZZZSurface"
                 dispValue = smoothstep(0, 0.02, dispValue);
                 dispValue -= mainTex.a ;
                 baseColor = lerp(baseColor, outlineColor, saturate(dispValue));
-                
+
+                //Metallic
+                metallic *= _Metallic;
+                smoothness *= _Glossiness;
                 
             }
             #endif
@@ -879,9 +888,9 @@ Shader "ZZZ/ZZZSurface"
                 float2 matCapUV = normalVS.xy * 0.5 + 0.5;
                 //折射
                 float refract = select(materialId,_MatCapRefract1,_MatCapRefract2,_MatCapRefract3,_MatCapRefract4,_MatCapRefract5);
-                //matcap
-                float4 otherData2 = tex2D(_OtherDataTex2,input.uv);
-                matCapMask = otherData2.b;
+                
+
+                
                 
                 //对需要折射的部分进行判断
                 if(refract > 0.5)
@@ -977,7 +986,6 @@ Shader "ZZZ/ZZZSurface"
             #endif
 
             //颜色调整
-            float test;
             float3 gammaColor = matCapColor;
             {
                 float pixelNDotL = dot(pixelNormalWS, lightDirectionWS);
@@ -988,11 +996,11 @@ Shader "ZZZ/ZZZSurface"
                 //occlusion = pow(occlusion, 1.5);
                 occlusion = min(1, occlusion);
 
-                test = occlusion;
 
                 //颜色Gamma矫正衰减系数
                 float attenuation = lerp((pixelNDotL * 0.5 + 0.5) * occlusion, saturate(pixelNDotL), 0.5);
 
+                
                 //钳制亮度
                 float3 matCapColorClamped = ClampColorMax(matCapColor);
 
@@ -1008,11 +1016,217 @@ Shader "ZZZ/ZZZSurface"
                 float3 matCapColorGammaHalf = lerp(matCapColor, matCapColorGamma, 0.5);
                 //均衡Gamma效果
                 gammaColor = lerp(matCapColorGammaHalf, matCapColorGamma, saturate(NDotL));
+
                 
             }
 
+
+            //pbrDiffuseColor进行金属与非金属的划分
+            //非金属的最大漫反射比例是0.96，0.96 x GammColor就是非金属的漫反射，而金属部分是只有镜面反射的没有漫反射，所以漫反射为0
             
-            return float4(gammaColor,baseAlpha);
+            float3 pbrDiffuseColor = lerp(0.96 * gammaColor, 0, metallic * 10);
+
+            //pbrSpecularColor镜面反射，非金属的镜面反射比例就是1-0.96
+            //因为非金属的镜面反射颜色不受本身颜色影响仅受材料的反射率影响，所以这里给上0.04固定颜色。而金属部分，金属的镜面反射是受颜色影响的所以反射原本的颜色
+            
+            float3 pbrSpecularColor = lerp(0.04, gammaColor, metallic * 10);
+
+            //return float4(metallic.xxx,baseAlpha);
+            float3 specularColor = 0;
+            #if _DOMAIN_BODY
+            {
+                float shape = select(materialId,
+                    _HighlightShape1,
+                    _HighlightShape2,
+                    _HighlightShape3,
+                    _HighlightShape4,
+                    _HighlightShape5
+
+                );
+                
+                float range = select(materialId,
+                    _SpecularRange1,
+                    _SpecularRange2,
+                    _SpecularRange3,
+                    _SpecularRange4,
+                    _SpecularRange5
+                );
+
+                //半角向量
+                float3 halfWS = normalize(lightDirectionWS + normalize(input.viewDirectionWS));
+
+                //计算高光项
+                float LoH = dot(lightDirectionWS, halfWS); //0~1
+                float rangeLoH = saturate(range * LoH * 0.75 + 0.25);//保证最低亮度为0.25但最大亮度还是为1
+                float rangeLoH2 = max(0.1, rangeLoH * rangeLoH);
+                
+                float NoL = dot(pixelNormalWS, lightDirectionWS);//-1~1
+                float rangeNoL = saturate(range * NoL * 0.75 + 0.25);//-0.5~1,0~1
+
+                //return float4(rangeNoL.xxx, baseAlpha);
+                
+                float specular = 0;
+                //非金属和面部高光
+                if(shape > 0.5)
+                {
+                    
+                    //判断使用球形法线的时候，_HeadSphereRang是否生效
+                    bool useSphere = _HeadSphereRange > 0;
+                    //球形法线计算
+                    float3 sphereNormalWS = positionWS - _HeadCenter;
+                    //法线长度
+                    float len = length(sphereNormalWS);
+                    sphereNormalWS = normalize(sphereNormalWS);
+                    //根据长度判断是否使用球形法线
+                    float sphereUsage = 1.0 - saturate((len - _HeadSphereRange) * 20);
+                    //高光项，法线决定高光形状
+                    float shapeNoL = dot(lightDirectionWS, sphereNormalWS);
+                    float shapeAttenuation = sqrt(saturate(shapeNoL * 0.5 + 0.5));
+
+                    float NDotH = dot(sphereNormalWS, halfWS);
+                    float NDotH01 = saturate(NDotH * 0.5 + 0.5);
+
+                    float headSpecular = NDotH01 * shapeAttenuation + specularMask - 1; 
+
+                    float softness = select(materialId,
+                        _ShapeSoftness1,
+                        _ShapeSoftness2,
+                        _ShapeSoftness3,
+                        _ShapeSoftness4,
+                        _ShapeSoftness5
+                    );
+                  
+                    //软硬控制
+                    headSpecular = saturate(headSpecular / softness);
+                    headSpecular = headSpecular * min(1.0, 1.0 / (6.0 * rangeLoH2)) * rangeNoL;
+                    
+                    //GGX
+                    float perceptualRoughness = 1 - smoothness;
+                    float roughness = perceptualRoughness * perceptualRoughness;
+
+                    float normalizationTerm = roughness * 4 + 2;
+                    float roughness2 = roughness * roughness;
+
+                    float roughness2MinusOne = roughness2 - 1;
+                    float NoH = dot(pixelNormalWS, halfWS);
+                    float rangeNoH = saturate(range * NoH * 0.75 + 0.25);//-0.5~1,0~1
+
+                    float d = rangeNoH * rangeNoH * roughness2MinusOne + 1.0;
+                    float ggx = roughness2 / ((d * d) * rangeLoH2 * normalizationTerm); 
+
+                    float otherSpecular = saturate((ggx - smoothness) * rangeNoL); 
+                    otherSpecular = otherSpecular / max(1e-5, roughness);
+
+                    //高光强度控制
+                    float toon = select(materialId,
+                        _ToonSpecular1,
+                        _ToonSpecular2,
+                        _ToonSpecular3,
+                        _ToonSpecular4,
+                        _ToonSpecular5
+                    );
+                    //根据模型大小控制高光强度
+                    float size = select(materialId,
+                        _ModelSize1,
+                        _ModelSize2,
+                        _ModelSize3,
+                        _ModelSize4,
+                        _ModelSize5
+                    );
+
+                    otherSpecular *= toon * size * specularMask;
+                    otherSpecular *= 10;
+                    otherSpecular = saturate(otherSpecular);
+                    
+                    specular = useSphere ? lerp(otherSpecular, headSpecular, sphereUsage) : otherSpecular;
+
+                    //return float4(specular.xxxx);
+                }
+                //金属高光
+                else
+                {
+                    //GGX
+                    float perceptualRoughness = 1 - smoothness;
+                    float roughness = perceptualRoughness * perceptualRoughness;
+
+                    float normalizationTerm = roughness * 4 + 2;
+                    float roughness2 = roughness * roughness;
+
+                    float roughness2MinusOne = roughness2 - 1;
+                    float NoH = dot(pixelNormalWS, halfWS);
+                    float rangeNoH = saturate(range * NoH * 0.75 + 0.25);//-0.5~1,0~1
+
+                    float d = rangeNoH * rangeNoH * roughness2MinusOne + 1.0;
+                    float ggx = roughness2 / ((d * d) * rangeLoH2 * normalizationTerm); 
+
+                    specular = saturate((ggx - smoothness) * rangeNoL); 
+                    specular = specular / max(1e-5, roughness);
+
+                    specular = saturate((ggx - smoothness))  / max(1e-5, roughness); 
+                    specular *= rangeNoL;
+
+                    //return float4(specular.xxx, baseAlpha);
+
+                    
+                    
+                    //高光强度控制
+                    float toon = select(materialId,
+                        _ToonSpecular1,
+                        _ToonSpecular2,
+                        _ToonSpecular3,
+                        _ToonSpecular4,
+                        _ToonSpecular5
+                    );
+                    //根据模型大小控制高光强度
+                    float size = select(materialId,
+                        _ModelSize1,
+                        _ModelSize2,
+                        _ModelSize3,
+                        _ModelSize4,
+                        _ModelSize5
+                    );
+
+                    specular *= toon * size * specularMask;
+                    specular *= 10;
+                    specular = saturate(specular);
+                    
+                }
+                
+                //整体强度控制
+                specular *= 100;
+                specular *= _SpecIntensity;
+
+                 //return float4(specular.xxx, baseAlpha);
+                
+                //染色
+                // float3 tintColor = select(materialId,
+                //     _SpecularColor1,
+                //     _SpecularColor2,
+                //     _SpecularColor3,
+                //     _SpecularColor4,
+                //     _SpecularColor5
+                // );
+                float3 tintColor = float4(1,1,1,1);
+                specularColor = specular * tintColor;
+                //return float4(specularColor,baseAlpha);
+            
+            }
+            #endif
+            
+            //Sh球谐光照
+            float3 ambientColor = SampleSH(pixelNormalWS) * gammaColor * _AmbientColorIntensity;
+            float3 color = ambientColor;
+            color += pbrDiffuseColor * albedo + pbrSpecularColor * specularColor * albedo;
+            color += max(0, pbrSpecularColor * specularColor * albedo - 1);
+            
+
+     
+
+
+            //雾效颜色混合设置
+            color = MixFog(color, input.positionWSAndFogFactor);
+            return float4(color, baseAlpha);
+            
         }
 
 
