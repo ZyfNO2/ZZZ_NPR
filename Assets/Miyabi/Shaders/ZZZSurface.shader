@@ -195,6 +195,7 @@ Shader "ZZZ/ZZZSurface"
         
         [Header(SDF)]
         [NoScaleOffset] _SDFTex("SDFTexture", 2D) = "white"{}
+        _HeadSphereRange("_HeadSphereRange",Float) = 0
         [HideInInspector] _HeadCenter("HeadCenter", Vector) = (0,0,0,0)
         [HideInInspector] _HeadForward("HeadForward", Vector) = (0,0,0,0)
         [HideInInspector] _HeadRight("HeadRight", Vector) = (0,0,0,0)
@@ -259,6 +260,34 @@ Shader "ZZZ/ZZZSurface"
         DFINE_SELECT(int)
         DFINE_SELECT(float)
         DFINE_SELECT(half)
+
+        #define DEFINE_POW(TYPE) \
+        TYPE pow2(TYPE x) { return TYPE(x * x);} \
+        TYPE##2 pow2(TYPE##2 x) { return TYPE##2(x * x);} \
+        TYPE##3 pow2(TYPE##3 x) { return TYPE##3(x * x);} \
+        TYPE##4 pow2(TYPE##4 x) { return TYPE##4(x * x);} \
+        TYPE pow3(TYPE x) { return TYPE(x * x * x);} \
+        TYPE##2 pow3(TYPE##2 x) { return TYPE##2(x * x * x);} \
+        TYPE##3 pow3(TYPE##3 x) { return TYPE##3(x * x * x);} \
+        TYPE##4 pow3(TYPE##4 x) { return TYPE##4(x * x * x);} \
+        TYPE pow4(TYPE x) { TYPE xx = x * x; return TYPE(xx * xx);} \
+        TYPE##2 pow4(TYPE##2 x) { TYPE##2 xx = x * x; return TYPE##2(xx * xx);} \
+        TYPE##3 pow4(TYPE##3 x) { TYPE##3 xx = x * x; return TYPE##3(xx * xx);} \
+        TYPE##4 pow4(TYPE##4 x) { TYPE##4 xx = x * x; return TYPE##4(xx * xx);} \
+        TYPE pow5(TYPE x) { TYPE xx = x * x; return TYPE(xx * xx * x);} \
+        TYPE##2 pow5(TYPE##2 x) { TYPE##2 xx = x * x; return TYPE##2(xx * xx * x);} \
+        TYPE##3 pow5(TYPE##3 x) { TYPE##3 xx = x * x; return TYPE##3(xx * xx * x);} \
+        TYPE##4 pow5(TYPE##4 x) { TYPE##4 xx = x * x; return TYPE##4(xx * xx * x);} \
+        TYPE pow6(TYPE x) { TYPE xx = x * x; return TYPE(xx * xx * xx);} \
+        TYPE##2 pow6(TYPE##2 x) { TYPE##2 xx = x * x; return TYPE##2(xx * xx * xx);} \
+        TYPE##3 pow6(TYPE##3 x) { TYPE##3 xx = x * x; return TYPE##3(xx * xx * xx);} \
+        TYPE##4 pow6(TYPE##4 x) { TYPE##4 xx = x * x; return TYPE##4(xx * xx * xx);} 
+
+        DEFINE_POW(bool)
+        DEFINE_POW(uint)
+        DEFINE_POW(int)
+        DEFINE_POW(float)
+        DEFINE_POW(half)
 
         float AverageColor(float3 color)
         {
@@ -646,7 +675,72 @@ Shader "ZZZ/ZZZSurface"
                 albedoForward *= saturate(sRamp[1]);
                 
             }
-           
+
+            //SDF
+            float angleForward = 0.1;  // 范围[0,1]，控制正面光照强度基准
+            // 初始化输出变量
+            float angleMapping = 0;    // 角度映射值（来自SDF纹理R通道）
+            float angleFunction = 0;   // 角度函数值（来自SDF纹理G通道）
+            float angleMapMask = 0;    // 区域遮罩值（来自SDF纹理A通道）
+            float angleThreshold = 0;   // 计算得到的光照角度阈值[0,1]
+            float4 angleData;
+            #if _DOMAIN_FACE  
+            {
+                
+                float s = lerp(albedoSmoothness, 0.025, saturate(2.5 * (angleFunction - 0.5)));
+                s = max(1e-5, s);  // 防除零保护
+
+                
+                float angleAttenuation = 8.6 + (angleMapping * 1.2 - 0.6) / (s * 4 + 1) - angleThreshold;
+
+            
+                float aramp[3] = {
+                    angleAttenuation / s,               // 主阴影曲线
+                    angleAttenuation / s - 1,           // SSS曲线（主曲线偏移）
+                    angleAttenuation / 0.125 - 16 * s   // 高光曲线（强非线性）
+                };
+
+               
+                float angleShadowFade = saturate(1 - aramp[0]);  // 主阴影渐变区域
+                float angleShadow = 0;                           // 保留字段（可用于硬阴影）
+                float angleShallowFade = 0;                      // 浅阴影动态混合区
+                float angleShallow = 0;                          // 保留字段（可用于次级阴影）
+                
+                // 次表面散射区域（取两条曲线的交集）
+                float angleSS = min(saturate(1 - aramp[1]), saturate(aramp[0]));
+                
+                // 正面高光区域（特殊曲线交集）
+                float angleFront = min(saturate(1 - aramp[2]), saturate(aramp[1]));
+                
+                // 前向高光强度（直接使用高光曲线）
+                float anglerForward = saturate(aramp[2]);
+                
+                float sRamp[1] = { 2. * shadowAttenuation };
+
+                // 动态区域调整：
+                angleShadowFade *= saturate(1 - sRamp[0]);  // 阴影区受光照衰减影响
+                
+                // 浅阴影混合公式说明：
+                // 当sRamp[0]高时(阴影强)：保留非高光区域(1-angleForward-angleFront-angleShallow)
+                // 当sRamp[0]低时(阴影弱)：显示SSS和高光区域(angleSS+angleFront+angleForward)
+                angleShallowFade += (1 - angleForward - angleFront - angleShallow) * saturate(sRamp[0]);
+                angleShallowFade += (angleSS + angleFront + angleForward) * saturate(1 - sRamp[0]);
+                
+                // 各区域受阴影衰减影响
+                angleSS *= saturate(sRamp[0]);
+                angleFront *= saturate(sRamp[0]);
+                anglerForward *= saturate(sRamp[0]);
+
+               
+                albedoShadowFade = lerp(albedoShadowFade, angleShadowFade, angleMapMask);
+                albedoShadow = lerp(albedoShadow, angleShadow, angleMapMask);
+                albedoShallowFade = lerp(albedoShallowFade, angleShallowFade, angleMapMask);
+                albedoShallow = lerp(albedoShallow, angleShallow, angleMapMask);
+                albedoSSS = lerp(albedoSSS, angleSS, angleMapMask);  
+                albedoFront = lerp(albedoFront, angleFront, angleMapMask);
+                albedoForward = lerp(albedoForward, angleForward, angleMapMask);
+            }
+            #endif
             
             float3 shadowFadeColor = 1.0;
             float3 shadowColor = 1.0;
@@ -686,86 +780,43 @@ Shader "ZZZ/ZZZSurface"
                 fowardColor = 1.0;
             }
 
-            // 初始化输出变量
-            float angleMapping = 0;    // 角度映射值（来自SDF纹理R通道）
-            float angleFunction = 0;   // 角度函数值（来自SDF纹理G通道）
-            float angleMapMask = 0;    // 区域遮罩值（来自SDF纹理A通道）
-            float angleThreshold = 0;   // 计算得到的光照角度阈值[0,1]
-            float4 angleData;
+            
 
             #if _DOMAIN_FACE  // 面部专属计算
             {
-                // --------------------------------------------------
-                // 阶段1：建立头部局部坐标系
-                // 技术说明：
-                // - 使用_HeadForward/_HeadRight定义头部朝向
-                // - 通过叉积计算头部上方向量
-                // --------------------------------------------------
+                
                 float3 headForward = normalize(_HeadForward - _HeadCenter);
                 float3 headRight = normalize(_HeadRight - _HeadCenter);
                 float3 headUp = normalize(cross(headForward, headRight));
 
-                // --------------------------------------------------
-                // 阶段2：光线方向投影处理
-                // 目的：消除垂直分量，得到在头部平面内的投影
-                // 公式解析：
-                // lightDirectionProjHeadWS = lightDirectionWS - (light·up)*up
-                // --------------------------------------------------
+                
                 float3 lightDirectionProjHeadWS = lightDirectionWS - dot(lightDirectionWS, headUp) * headUp;
                 lightDirectionProjHeadWS = normalize(lightDirectionProjHeadWS);
 
-                // --------------------------------------------------
-                // 阶段3：计算局部坐标系下的光照角度
-                // 输出说明：
-                // sX - 光线在头部右侧方向的分量[-1,1]
-                // sZ - 光线在头部前向的反方向分量[-1,1]
-                // --------------------------------------------------
+                
                 float sX = dot(lightDirectionProjHeadWS, headRight);
                 float sZ = dot(lightDirectionProjHeadWS, -headForward);
 
-                // --------------------------------------------------
-                // 阶段4：角度阈值计算
-                // 数学处理：
-                // 1. atan2(sX,sZ) 获取[-π,π]的角度值
-                // 2. 除以π归一化到[-1,1]
-                // 3. 转换到[0,1]范围：
-                //    - 正角度：1 - angle
-                //    - 负角度：1 + angle
-                // 美术意义：
-                // 表示光线与面部正前方向的夹角程度，0=完全侧面，1=完全正面
-                // --------------------------------------------------
+               
                 angleThreshold = atan2(sX, sZ) / 3.14159265359;
                 angleThreshold = angleThreshold > 0 ? (1 - angleThreshold) : (1 + angleThreshold);
 
-                // --------------------------------------------------
-                // 阶段5：UV坐标处理
-                // 特殊处理：当光线来自右侧时水平翻转UV
-                // 目的：保持左右脸的光照对称性
-                // --------------------------------------------------
+                
                 float2 angleUV = input.uv;
                 if(dot(lightDirectionProjHeadWS, headRight) > 0)
                 {
                     angleUV.x = 1.0 - angleUV.x;  // 水平翻转
                 }
-
-                // --------------------------------------------------
-                // 阶段6：SDF纹理采样
-                // 通道分配：
-                // R - 角度映射（预计算的面部各区域角度响应）
-                // G - 角度函数（控制材质属性变化的梯度）
-                // A - 区域遮罩（混合权重）
-                // 注意：B通道未使用（可扩展）
-                // --------------------------------------------------
+            
                 angleData = SAMPLE_TEXTURE2D(_SDFTex, sampler_SDFTex, angleUV);
                 angleMapping = angleData.r;
                 angleFunction = angleData.g;
                 angleMapMask = angleData.a;
-
+                
                 float3 outlineColor = _OutlineColor1.rgb * 0.2;
                 float viewDotHeadUp = dot(headUp, input.viewDirectionWS);
                 float viewDotHeadForward = dot(headForward, input.viewDirectionWS);
-
-                // 视角从上往下到水平之间Alpha由水平值控制，从下往上则由_NoseLineRndDisk控制
+                
                 float dispValue = lerp(_NoseLineKonDisp, _NoseLineHorDisp, smoothstep(0, 0.75, saturate(viewDotHeadUp + 0.85)));
                 //dispValue = viewDotHeadForward - dispValue;
                 dispValue = viewDotHeadForward * dispValue;
@@ -779,95 +830,7 @@ Shader "ZZZ/ZZZSurface"
                 
             }
             #endif
-            float angleForward = 0.1;  // 范围[0,1]，控制正面光照强度基准
-            #if _DOMAIN_FACE  // 面部专属光照计算
-            {
-                // --------------------------------------------------
-                // 阶段1：动态光滑度计算
-                // 目的：根据角度函数值动态调整材质光滑度
-                // 技术说明：
-                // - angleFunction来自SDFTex的G通道，表示面部各区域的角度响应曲线
-                // - 2.5为锐度系数，控制过渡带的陡峭程度（美术可调）
-                // - 0.025是最小光滑度，防止完全粗糙区域
-                // --------------------------------------------------
-                float s = lerp(albedoSmoothness, 0.025, saturate(2.5 * (angleFunction - 0.5)));
-                s = max(1e-5, s);  // 防除零保护
-
-                // --------------------------------------------------
-                // 阶段2：角度衰减计算
-                // 公式解析：
-                // 8.6 -> 基础偏移量（控制整体亮度基准）
-                // angleMapping*1.2-0.6 -> 将[0,1]映射到[-0.6,0.6]的偏移
-                // (s*4+1) -> 非线性衰减系数，s越大衰减越强
-                // angleThreshold -> 美术可控的全局角度阈值
-                // --------------------------------------------------
-                float angleAttenuation = 8.6 + (angleMapping * 1.2 - 0.6) / (s * 4 + 1) - angleThreshold;
-
-                // --------------------------------------------------
-                // 阶段3：三阶衰减曲线构建
-                // 曲线用途：
-                // [0] 主阴影曲线 - 控制基础阴影渐变
-                // [1] 次表面曲线 - 控制SSS效果范围
-                // [2] 高光曲线   - 控制正面高光强度
-                // --------------------------------------------------
-                float aramp[3] = {
-                    angleAttenuation / s,               // 主阴影曲线
-                    angleAttenuation / s - 1,           // SSS曲线（主曲线偏移）
-                    angleAttenuation / 0.125 - 16 * s   // 高光曲线（强非线性）
-                };
-
-                // --------------------------------------------------
-                // 阶段4：区域遮罩生成
-                // 注意：所有saturate保证数值在[0,1]范围内
-                // --------------------------------------------------
-                float angleShadowFade = saturate(1 - aramp[0]);  // 主阴影渐变区域
-                float angleShadow = 0;                           // 保留字段（可用于硬阴影）
-                float angleShallowFade = 0;                      // 浅阴影动态混合区
-                float angleShallow = 0;                          // 保留字段（可用于次级阴影）
-                
-                // 次表面散射区域（取两条曲线的交集）
-                float angleSS = min(saturate(1 - aramp[1]), saturate(aramp[0]));
-                
-                // 正面高光区域（特殊曲线交集）
-                float angleFront = min(saturate(1 - aramp[2]), saturate(aramp[1]));
-                
-                // 前向高光强度（直接使用高光曲线）
-                float anglerForward = saturate(aramp[2]);
-
-                // --------------------------------------------------
-                // 阶段5：阴影衰减混合
-                // 说明：shadowAttenuation通常来自主光源阴影图
-                // 2.0为阴影增强系数
-                // --------------------------------------------------
-                float sRamp[1] = { 2. * shadowAttenuation };
-
-                // 动态区域调整：
-                angleShadowFade *= saturate(1 - sRamp[0]);  // 阴影区受光照衰减影响
-                
-                // 浅阴影混合公式说明：
-                // 当sRamp[0]高时(阴影强)：保留非高光区域(1-angleForward-angleFront-angleShallow)
-                // 当sRamp[0]低时(阴影弱)：显示SSS和高光区域(angleSS+angleFront+angleForward)
-                angleShallowFade += (1 - angleForward - angleFront - angleShallow) * saturate(sRamp[0]);
-                angleShallowFade += (angleSS + angleFront + angleForward) * saturate(1 - sRamp[0]);
-                
-                // 各区域受阴影衰减影响
-                angleSS *= saturate(sRamp[0]);
-                angleFront *= saturate(sRamp[0]);
-                anglerForward *= saturate(sRamp[0]);
-
-                // --------------------------------------------------
-                // 阶段6：最终效果混合
-                // angleMapMask来自SDFTex的A通道，控制各区域影响权重
-                // --------------------------------------------------
-                albedoShadowFade = lerp(albedoShadowFade, angleShadowFade, angleMapMask);
-                albedoShadow = lerp(albedoShadow, angleShadow, angleMapMask);
-                albedoShallowFade = lerp(albedoShallowFade, angleShallowFade, angleMapMask);
-                albedoShallow = lerp(albedoShallow, angleShallow, angleMapMask);
-                albedoSSS = lerp(albedoSSS, angleSS, angleMapMask);  
-                albedoFront = lerp(albedoFront, angleFront, angleMapMask);
-                albedoForward = lerp(albedoForward, angleForward, angleMapMask);
-            }
-            #endif
+            
 
             
             float3 lightColorScaledByMax = ScaleColorByMax(lightColor);
@@ -1208,6 +1171,10 @@ Shader "ZZZ/ZZZSurface"
             
             }
             #endif
+
+            
+
+            
             
             //Sh球谐光照
             float3 ambientColor = SampleSH(pixelNormalWS) * gammaColor * _AmbientColorIntensity;
@@ -1216,9 +1183,7 @@ Shader "ZZZ/ZZZSurface"
             color += max(0, pbrSpecularColor * specularColor * albedo - 1);
             
 
-     
-
-
+            
             //雾效颜色混合设置
             color = MixFog(color, input.positionWSAndFogFactor);
             return float4(color, baseAlpha);

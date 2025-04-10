@@ -154,7 +154,7 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 1
     - _GlossyReflections: 1
-    - _HeadSphereRange: 0
+    - _HeadSphereRange: 4
     - _HighlightShape: 0
     - _HighlightShape1: 0
     - _HighlightShape2: 1
@@ -242,7 +242,7 @@ Material:
     - _ShapeSoftness3: 0.1
     - _ShapeSoftness4: 0.1
     - _ShapeSoftness5: 0.1
-    - _SkinMatId: 0
+    - _SkinMatId: 5
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
     - _SpecIntensity: 0.25
