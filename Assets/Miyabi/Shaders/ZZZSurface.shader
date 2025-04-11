@@ -21,7 +21,7 @@ Shader "ZZZ/ZZZSurface"
         
         _AmbientColorIntensity ("Ambient Intensity", Range(0, 1)) = 0.333
 
-        [Enum(s0,0,s1,1,s2,2,s3,3,s4,4,s5,5)] _SkinMatId ("SkinMatId", Float) = 0
+        [Enum(s0,0,s1,1,s2,2,s3,3,s4,4,no skin,5)] _SkinMatId ("SkinMatId", Float) = 0
 
         _ModelSize1 ("Model Size 1", Range(0, 100)) = 1
         _ModelSize2 ("Model Size 2", Range(0, 100)) = 1
@@ -98,17 +98,17 @@ Shader "ZZZ/ZZZSurface"
         [HDR] _SpecularColor5 ("Specular Color 5", Color) = (1,1,1,1)
 
         [Header(Rim Glow)]
-        [HDR] _RimGlowLightColor ("Light Color 1", Color) = (0.55,0.55,0.55,1)
+        [HDR] _RimGlowLightColor1 ("Light Color 1", Color) = (0.55,0.55,0.55,1)
         [HDR] _RimGlowLightColor2 ("Light Color 2", Color) = (0.55,0.55,0.55,1)
         [HDR] _RimGlowLightColor3 ("Light Color 3", Color) = (0.55,0.55,0.55,1)
         [HDR] _RimGlowLightColor4 ("Light Color 4", Color) = (0.55,0.55,0.55,1)
-        [HDR] _RimGlowLightColors ("Light Color 5", Color) = (0.55,0.55,0.55,1)
+        [HDR] _RimGlowLightColor5 ("Light Color 5", Color) = (0.55,0.55,0.55,1)
 
-        [HDR] _UISunColor ("UI Sun Color 1", Color) = (1,0.92,0.9,1)
+        [HDR] _UISunColor1 ("UI Sun Color 1", Color) = (1,0.92,0.9,1)
         [HDR] _UISunColor2 ("UI Sun Color 2", Color) = (1,0.92,0.9,1)
         [HDR] _UISunColor3 ("UI Sun Color 3", Color) = (1,0.92,0.9,1)
         [HDR] _UISunColor4 ("UI Sun Color 4", Color) = (1,0.92,0.9,1)
-        [HDR] _UISunColors ("UI Sun Color 5", Color) = (1,0.92,0.9,1)
+        [HDR] _UISunColor5 ("UI Sun Color 5", Color) = (1,0.92,0.9,1)
 
         [Header(Outline)]
         [Toggle(_OUTLINE_PASS)] _Outline ("Outline", Float) = 1
@@ -408,17 +408,17 @@ Shader "ZZZ/ZZZSurface"
         float3 _SpecularColor4;
         float3 _SpecularColor5;
 
-        float3 _RimGlowLightColor;
+        float3 _RimGlowLightColor1;
         float3 _RimGlowLightColor2;
         float3 _RimGlowLightColor3;
         float3 _RimGlowLightColor4;
-        float3 _RimGlowLightColors;
+        float3 _RimGlowLightColor5;
 
-        float3 _UISunColor;
+        float3 _UISunColor1;
         float3 _UISunColor2;
         float3 _UISunColor3;
         float3 _UISunColor4;
-        float3 _UISunColors;
+        float3 _UISunColor5;
 
         float3 _OutlineColor1;
         float3 _OutlineColor2;
@@ -1172,7 +1172,134 @@ Shader "ZZZ/ZZZSurface"
             }
             #endif
 
-            
+            ///RimColor
+            float3 rimGlowColor = 0;
+            {
+                //获取对应ID设置为皮肤
+                //bool isSkin = true;
+                bool isSkin = materialId == _SkinMatId;
+
+                //return float4(isSkin.xxxx);
+                
+                //背光方向衰减
+                float LoV = dot(lightDirectionWS, input.viewDirectionWS);
+                float viewAttenuation = -LoV * 0.5 + 0.5;
+                //进行0.5~1的平滑映射
+                viewAttenuation = pow2(viewAttenuation);
+                viewAttenuation = viewAttenuation * 0.5 + 0.5;
+
+                
+                //法线垂直方向衰减
+                float verticalAttenuation =  pixelNormalWS.y * 0.5 + 0.5;
+                verticalAttenuation = isSkin ? verticalAttenuation : pow2(verticalAttenuation);
+                verticalAttenuation = smoothstep(0, 1, verticalAttenuation);
+                
+                //兰伯特衰减
+                float lightAttenuation = saturate(dot(pixelNormalWS,lightDirectionWS)) * shadowAttenuation;
+
+                //菲涅尔
+                float cameraDistance = length(input.viewDirectionWS);
+                float NoV = dot(pixelNormalWS, input.viewDirectionWS);
+                float fresnelDistanceFade = (isSkin ? 0.75 : 0.65) - 0.45 * min(1, cameraDistance / 12.0);
+                float fresnelAttenuation = 1 - NoV - fresnelDistanceFade;
+
+                float fresnelSoftness = isSkin ? 0.2 : 0.3;
+                fresnelAttenuation = smoothstep(0, fresnelSoftness, fresnelAttenuation);
+
+                
+                //return float4(fresnelAttenuation.xxxx);
+                
+                //相机距离衰减
+                //5m后进行衰减
+                float distanceAttenuation = 1 - 0.7 * saturate(cameraDistance * 0.2 - 1);
+
+                //背光中心外围方向衰减
+                float edgeAttenuation = 1 - pow4(pow5(viewAttenuation));
+
+                //阳光染色
+                float3 sunColor = select(materialId,
+                    _UISunColor1,
+                    _UISunColor2,
+                    _UISunColor3,
+                    _UISunColor4,
+                    _UISunColor5
+                );
+                //皮肤部分只混和灰度，非皮肤混合阳光颜色
+                float sunLuminance = Luminance(sunColor);
+                sunColor = isSkin ? sunColor : sunLuminance.xxx;
+
+                
+                
+                //获取缩放系数，1~平滑增大
+                float3 sunColorScaled = pow2(pow4(sunColor));
+                sunColorScaled /= max(1e-5, dot(sunColorScaled, 0.7));
+                //缩放控制
+                sunColor = AverageColor(sunColor) * sunColorScaled;
+
+                //投影部分为阳光颜色
+                sunColor = lerp(albedo, sunColor, shadowAttenuation);
+                //背光方向中心保持Albedo颜色
+                sunColor = lerp(albedo, sunColor, edgeAttenuation);
+
+                float3 rimDiffuse = pow(max(1e-5, pbrDiffuseColor), 0.2);
+                rimDiffuse = normalize(rimDiffuse);
+
+                //平均漫反射和边缘光强度
+                float diffuseBrightness = AverageColor(pbrDiffuseColor);
+                diffuseBrightness = (1 - 0.2 * pow2(diffuseBrightness)) * 0.1;
+                rimDiffuse *= diffuseBrightness;
+
+                float3 rimSpecular = pbrSpecularColor;
+                float3 rimColor = lerp(rimDiffuse, rimSpecular, metallic);
+
+                rimColor *= 48;
+                rimColor *= fresnelAttenuation * verticalAttenuation * viewAttenuation * lightAttenuation * distanceAttenuation * sunColor;
+
+                float3 glowColor = select(materialId,
+                    _RimGlowLightColor1,
+                    _RimGlowLightColor2,
+                    _RimGlowLightColor3,
+                    _RimGlowLightColor4,
+                    _RimGlowLightColor5
+                );
+
+                rimColor *= glowColor;
+
+                
+                //1以上的亮度更平缓的增亮
+                float3 rimColorBrightness = AverageColor(rimColor);
+                rimColorBrightness = pow2(rimColorBrightness);
+                rimColorBrightness = 1 + 0.5 * rimColorBrightness;
+                rimColor *= rimColorBrightness;
+
+                rimGlowColor = rimColor;
+                
+                //return float4(rimGlowColor,baseAlpha);
+                
+                //屏幕空间边缘光
+                float screenSpaceRim = 1.0;
+                #if _SCREEN_SPACE_RIM
+                {
+                    float linearEyeDepth = input.positionCS.w;
+                    float3 normalVS = TransformWorldToViewDir(normalWS);
+                    float2 UVOffset = float2(normalize(normalVS.xy)) * _ScreenSpaceRimWidth / linearEyeDepth;
+                    int2 texPos = input.positionCS.xy + UVOffset;
+                    texPos = min(max(0, texPos), _ScaledScreenParams.xy - 1); 
+                    float offsetSceneDepth = LoadSceneDepth(texPos);
+                    float offsetSceneLinearEyeDepth = LinearEyeDepth(offsetSceneDepth, _ZBufferParams);
+                    screenSpaceRim = saturate((offsetSceneLinearEyeDepth - (linearEyeDepth + _ScreenSpaceRimThreshold)) * 10 / _ScreenSpaceRimFadeout);
+
+                    screenSpaceRim *= _ScreenSpaceRimBrightness;
+
+                    //return float4(screenSpaceRim.xxx,baseAlpha);
+                }
+                #endif
+
+                
+               rimGlowColor = rimColor * screenSpaceRim;
+
+                //return float4(rimColor,baseAlpha);
+            }
 
             
             
@@ -1181,9 +1308,11 @@ Shader "ZZZ/ZZZSurface"
             float3 color = ambientColor;
             color += pbrDiffuseColor * albedo + pbrSpecularColor * specularColor * albedo;
             color += max(0, pbrSpecularColor * specularColor * albedo - 1);
-            
+            color += rimGlowColor;
 
-            
+     
+
+
             //雾效颜色混合设置
             color = MixFog(color, input.positionWSAndFogFactor);
             return float4(color, baseAlpha);
