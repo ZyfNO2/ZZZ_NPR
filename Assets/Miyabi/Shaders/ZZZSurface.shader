@@ -177,21 +177,24 @@ Shader "ZZZ/ZZZSurface"
         [Enum(UnityEngine.Rendering.BlendMode)] _SrcBlendMode ("Src blend mode (Default One)", Float) = 1
         [Enum(UnityEngine.Rendering.BlendMode)] _DstBlendMode ("Dst blend mode (Default Zero)", Float) = 0
         [Enum(UnityEngine.Rendering.BlendOp)] _BlendOp ("Blend operation (Default Add)", Float) = 0
-        _StencilRef ("Stencil reference", Int) = 0
-        [Enum(UnityEngine.Rendering.CompareFunction)] _StencilComp ("Stencil compare function", Int) = 0
-        [Enum(UnityEngine.Rendering.StencilOp)] _StencilPassOp ("Stencil pass operation", Int) = 0
-        [Enum(UnityEngine.Rendering.StencilOp)] _StencilFailOp ("Stencil fail operation", Int) = 0
-        [Enum(UnityEngine.Rendering.StencilOp)] _StencilZFailOp ("Stencil z fail operation", Int) = 0
-        [Header(SRP Default)]
-        [Toggle(_SRP_DEFAULT_PASS)] _SRPDefaultPass ("SRP Default Pass", Int) = 0
-        [Enum(UnityEngine.Rendering.BlendMode)] _SRPSrcBlendMode ("SRP src blend mode (Default One)", Float) = 1
-        [Enum(UnityEngine.Rendering.BlendMode)] _SRPDstBlendMode ("SRP dst blend mode (Default Zero)", Float) = 0
-        [Enum(UnityEngine.Rendering.BlendOp)] _SRPBlendOp ("SRP blend operation (Default Add)", Float) = 0
-        _SRStencilRef ("SRP stencil reference", Int) = 0
-        [Enum(UnityEngine.Rendering.CompareFunction)] _SRPStencilComp ("SRP stencil compare function", Int) = 0
-        [Enum(UnityEngine.Rendering.StencilOp)] _SRPStencilPassOp ("SRP stencil pass operation", Int) = 0
-        [Enum(UnityEngine.Rendering.StencilOp)] _SRPStencilFailOp ("SRP stencil fail operation", Int) = 0
-        [Enum(UnityEngine.Rendering.StencilOp)] _SRPStencilZFailOp ("SRP stencil Z fail operation", Int) = 0
+        
+        _StencilRef("蒙版值", int) = 0
+        [Enum(UnityEngine.Rendering.CompareFunction)]_StencilComp("蒙版判断条件", int) = 0
+        [Enum(UnityEngine.Rendering.StencilOp)]_StencilPassOp("蒙版测试通过", int) = 0
+        [Enum(UnityEngine.Rendering.StencilOp)]_StencilFailOp("蒙版测试失败", int) = 0
+        [Enum(UnityEngine.Rendering.StencilOp)]_StencilZFailOp("深度Z测试失败", int) = 0
+        
+        //眼睛重绘
+        [Header(EyeReDrawPassOption)]
+        [Toggle(_SRP_DEFAULT_PASS)] _SRP_DEFAULT_PASS(" SRP Default Pass", int) = 0
+        [Enum(UnityEngine.Rendering.BlendMode)]_SRPBlendSrc("SRPSrcAlpha混合源乘子", int) = 1
+        [Enum(UnityEngine.Rendering.BlendMode)]_SRPBlendDst("SRPDstAlpha混合目标乘子", int) = 0
+        [Enum(UnityEngine.Rendering.BlendOp)]_SRPBlendOp("SRPAlpha混合算符", int) = 0
+        _SRPStencilRef("SRP蒙版值", int) = 0
+        [Enum(UnityEngine.Rendering.CompareFunction)]_SRPStencilComp("SRP蒙版判断条件", int) = 0
+        [Enum(UnityEngine.Rendering.StencilOp)]_SRPStencilPassOp("SRP蒙版测试通过", int) = 0
+        [Enum(UnityEngine.Rendering.StencilOp)]_SRPStencilFailOp("SRP蒙版测试失败", int) = 0
+        [Enum(UnityEngine.Rendering.StencilOp)]_SRPStencilZFailOp("SRP深度Z测试失败", int) = 0
         
         [Header(SDF)]
         [NoScaleOffset] _SDFTex("SDFTexture", 2D) = "white"{}
@@ -200,7 +203,8 @@ Shader "ZZZ/ZZZSurface"
         [HideInInspector] _HeadForward("HeadForward", Vector) = (0,0,0,0)
         [HideInInspector] _HeadRight("HeadRight", Vector) = (0,0,0,0)
         
-        
+          //临时//
+        _AlphaClip("Alpha Clip",Range(0, 1)) = 0.333
         
         
     }
@@ -216,17 +220,19 @@ Shader "ZZZ/ZZZSurface"
         #pragma shader_feature_local _DOMAIN_FACE
         #pragma shader_feature_local _DOMAIN_EYE
         #pragma shader_feature_local _DOMAIN_BODY
-
-        #pragma multi_compile _ _MAIN_LIGHT_SHADOWS
-        #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
-        #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_SCREEN
-        #pragma multi_compile_fragment _ _LIGHT_LAYERS
-        #pragma multi_compile_fragment _ _LIGHT_COOKIES
-        #pragma multi_compile_fragment _ _SCREEN_SPACE_OCCLUSION
-        #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
-        #pragma multi_compile_fragment _ _SHADOWS_SOFT
-        #pragma multi_compile_fragment _ _REFLECTION_PROBE_BLENDING
-        #pragma multi_compile_fragment _ _REFLECTION_PROBE_BOX_PROJECTION
+        #pragma shader_feature_local _SRP_DEFAULT_PASS
+        
+        // #pragma multi_compile _ _MAIN_LIGHT_SHADOWS
+        // #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
+        // #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_SCREEN
+        // #pragma multi_compile_fragment _ _LIGHT_LAYERS
+        // #pragma multi_compile_fragment _ _LIGHT_COOKIES
+        // #pragma multi_compile_fragment _ _SCREEN_SPACE_OCCLUSION
+        // #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
+        // #pragma multi_compile_fragment _ _SHADOWS_SOFT
+        // #pragma multi_compile_fragment _ _REFLECTION_PROBE_BLENDING
+        // #pragma multi_compile_fragment _ _REFLECTION_PROBE_BOX_PROJECTION
+        
 
         #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
         #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
@@ -489,8 +495,18 @@ Shader "ZZZ/ZZZSurface"
         float specularMask = 0;
 
         float smoothness = 0.58;
+
+        //蒙版测试
+        int _StencilRef;
+        //眼部重绘
+        int _SRPStencilRef;
+
+           
         
         CBUFFER_END
+
+
+        // 定义输入结构体 appdata to Vertex
         struct UniversalAttributes
         {
             float4 positionOS : POSITION;
@@ -498,7 +514,7 @@ Shader "ZZZ/ZZZSurface"
             float3 normalOS : NORMAL;
             float2 texcoord : TEXCOORD0;
         };
-
+         // 定义输出结构体 Vertex to frag
         struct UniversalVaryings
         {
             float2 uv : TEXCOORD0;
@@ -1518,10 +1534,14 @@ Shader "ZZZ/ZZZSurface"
             {
                 "LightMode" = "UniversalForward"
             }
-            Cull [_Cull]
-            Blend [_SrcBlendMode] [_DstBlendMode]
+            
+//            Cull [_Cull]
+//            ZWrite [_ZWrite]
+            
             BlendOp [_BlendOp]
-            ZWrite [_ZWrite]
+            Blend [_SrcBlendMode] [_DstBlendMode]
+            
+            //蒙版测试
             Stencil {
                 Ref [_StencilRef]
                 Comp [_StencilComp]
@@ -1540,6 +1560,49 @@ Shader "ZZZ/ZZZSurface"
 
             #pragma multi_compile_fog
             ENDHLSL
+        }
+
+        // SRPDefaultUnlit Pass
+        pass
+        {
+            Name"EyeReDrawPass"
+            
+            Tags{
+                "LightMode" = "SRPDefaultUnlit"
+            }
+            
+            ZWrite [_ZWrite]
+            Cull [_Cull]
+            BlendOp [_SRPBlendOp]               //混合算符
+            Blend [_SRPBlendSrc] [_SRPBlendDst]    //混合乘子
+
+            //蒙版测试
+            Stencil {
+                Ref [_SRPStencilRef]
+                Comp [_SRPStencilComp]
+                Pass [_SRPStencilPassOp]
+                Fail [_SRPStencilFailOp]
+                ZFail [_SRPStencilZFailOp]
+            }
+
+            // HLSL程序段
+
+            HLSLPROGRAM
+            #pragma vertex MainVS2
+            #pragma fragment MainPS2
+            #pragma multi_compile_fog
+            
+
+            #if _SRP_DEFAULT_PASS
+            UniversalVaryings MainVS2(UniversalAttributes input){return MainVS(input);}
+            float4 MainPS2(UniversalVaryings input, bool isFrontFace : SV_IsFrontFace) : SV_Target{return MainPS(input, isFrontFace);}
+            #else
+            void MainVS2(){}
+            void MainPS2(){}
+            #endif
+
+            ENDHLSL
+
         }
 
         //Outline

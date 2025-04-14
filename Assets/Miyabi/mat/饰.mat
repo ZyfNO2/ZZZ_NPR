@@ -151,8 +151,10 @@ Material:
     - _AlphaToMask: 0
     - _AmbientColorIntensity: 0.333
     - _Blend: 0
+    - _BlendDst: 0
     - _BlendModePreserveSpecular: 1
     - _BlendOp: 0
+    - _BlendSrc: 1
     - _BumpScale: 1
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
@@ -232,14 +234,18 @@ Material:
     - _RefractDepth3: 0.5
     - _RefractDepth4: 0.5
     - _RefractDepths: 0.5
+    - _SRPBlendDst: 0
     - _SRPBlendOp: 0
+    - _SRPBlendSrc: 1
     - _SRPDefaultPass: 0
     - _SRPDstBlendMode: 0
     - _SRPSrcBlendMode: 1
     - _SRPStencilComp: 0
     - _SRPStencilFailOp: 0
     - _SRPStencilPassOp: 0
+    - _SRPStencilRef: 0
     - _SRPStencilZFailOp: 0
+    - _SRP_DEFAULT_PASS: 0
     - _SRStencilRef: 0
     - _ScreenSpaceRim: 1
     - _ScreenSpaceRimBrightness: 1
@@ -324,9 +330,11 @@ Material:
     - _RefractParam4: {r: 5, g: 5, b: 0, a: 0}
     - _RefractParams: {r: 5, g: 5, b: 0, a: 0}
     - _RimGlowLightColor: {r: 0.55, g: 0.55, b: 0.55, a: 1}
+    - _RimGlowLightColor1: {r: 0.55, g: 0.55, b: 0.55, a: 1}
     - _RimGlowLightColor2: {r: 0.55, g: 0.55, b: 0.55, a: 1}
     - _RimGlowLightColor3: {r: 0.55, g: 0.55, b: 0.55, a: 1}
     - _RimGlowLightColor4: {r: 0.55, g: 0.55, b: 0.55, a: 1}
+    - _RimGlowLightColor5: {r: 0.55, g: 0.55, b: 0.55, a: 1}
     - _RimGlowLightColors: {r: 0.55, g: 0.55, b: 0.55, a: 1}
     - _ShadowColor: {r: 0.6, g: 0.6, b: 0.6, a: 1}
     - _ShadowColor1: {r: 0.6, g: 0.6, b: 0.6, a: 1}
@@ -349,9 +357,11 @@ Material:
     - _SpecularColor5: {r: 1, g: 1, b: 1, a: 1}
     - _SpecularColors: {r: 1, g: 1, b: 1, a: 1}
     - _UISunColor: {r: 1, g: 0.92, b: 0.9, a: 1}
+    - _UISunColor1: {r: 1, g: 0.92, b: 0.9, a: 1}
     - _UISunColor2: {r: 1, g: 0.92, b: 0.9, a: 1}
     - _UISunColor3: {r: 1, g: 0.92, b: 0.9, a: 1}
     - _UISunColor4: {r: 1, g: 0.92, b: 0.9, a: 1}
+    - _UISunColor5: {r: 1, g: 0.92, b: 0.9, a: 1}
     - _UISunColors: {r: 1, g: 0.92, b: 0.9, a: 1}
     - _outlineColors: {r: 0, g: 0, b: 0, a: 1}
   m_BuildTextureStacks: []
