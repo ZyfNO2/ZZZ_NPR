@@ -524,7 +524,7 @@ Shader "ZZZ/ZZZSurface"
             float3 viewDirectionWS : TEXCOORD4;
             float4 positionCS : SV_POSITION;
         };
-
+        
         UniversalVaryings MainVS(UniversalAttributes input)
         {
             VertexPositionInputs positionInputs = GetVertexPositionInputs(input.positionOS.xyz);
@@ -540,7 +540,7 @@ Shader "ZZZ/ZZZSurface"
             output.uv = input.texcoord;
             return output;
         }
-
+        //Main Pixel Shader
         float4 MainPS(UniversalVaryings input, bool isFrontFace : SV_IsFrontFace) : SV_Target
         {
             float4 mainTex = tex2D(_MainTex,input.uv);
@@ -1526,17 +1526,17 @@ Shader "ZZZ/ZZZSurface"
             ENDHLSL
         }
 
-        //UniversalForward
+        //Base
         Pass
         {
-            Name "UniversalForward"
+            Name "Base"
             Tags
             {
                 "LightMode" = "UniversalForward"
             }
             
-//            Cull [_Cull]
-//            ZWrite [_ZWrite]
+            //Cull [_Cull]
+            //ZWrite [_ZWrite]
             
             BlendOp [_BlendOp]
             Blend [_SrcBlendMode] [_DstBlendMode]
