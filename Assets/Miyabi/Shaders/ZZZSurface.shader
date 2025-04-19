@@ -221,23 +221,12 @@ Shader "ZZZ/ZZZSurface"
         #pragma shader_feature_local _DOMAIN_EYE
         #pragma shader_feature_local _DOMAIN_BODY
         #pragma shader_feature_local _SRP_DEFAULT_PASS
-        
-        // #pragma multi_compile _ _MAIN_LIGHT_SHADOWS
-        // #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
-        // #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_SCREEN
-        // #pragma multi_compile_fragment _ _LIGHT_LAYERS
-        // #pragma multi_compile_fragment _ _LIGHT_COOKIES
-        // #pragma multi_compile_fragment _ _SCREEN_SPACE_OCCLUSION
-        // #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
-        // #pragma multi_compile_fragment _ _SHADOWS_SOFT
-        // #pragma multi_compile_fragment _ _REFLECTION_PROBE_BLENDING
-        // #pragma multi_compile_fragment _ _REFLECTION_PROBE_BOX_PROJECTION
-        
 
         #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
         #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
         #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl"
 
+        
         #define DEFINE_MINMAX3(TYPE)\
         TYPE min3(TYPE a, TYPE b, TYPE c) {return TYPE(min(min(a, b), c));};\
         TYPE##2 min3(TYPE##2 a, TYPE##2 b, TYPE##2 c) {return TYPE##2(min(min(a, b), c));}\
